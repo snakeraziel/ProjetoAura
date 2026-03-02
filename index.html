@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PROJETO AURA - Código Zero</title>
+<title>Código Zero</title>
 <style>
 :root {
   --bg:#0f172a; --card:#1e293b; --accent:#3b82f6; --success:#22c55e; --text:#f1f5f9;
@@ -14,10 +14,40 @@ h2{text-align:center;color:var(--accent);font-size:1.2rem}
 .upload-area{border:2px dashed var(--accent);padding:20px;text-align:center;border-radius:12px;background:var(--card);margin-bottom:15px}
 .btn{width:100%;padding:14px;border-radius:10px;border:none;font-weight:700;font-size:1rem;margin-top:10px}
 .btn-upload{background:var(--accent);color:#fff}
-.btn-search{background:#334155;color:#fff}
 .btn-apply{background:var(--success);color:#fff}
-.search-box{display:flex;gap:10px;margin-bottom:15px}
-input{flex:1;padding:12px;border-radius:10px;border:1px solid #334155;background:#020617;color:#fff}
+.search-box{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.search-box{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+  align-items:center;   /* 👈 alinha no mesmo nível */
+}
+
+.search-box input,
+.search-box .btn-search{
+  flex:1;
+  height:48px;              /* 👈 altura fixa */
+  padding:0 12px;          /* padding só lateral */
+  border-radius:10px;
+  border:1px solid #334155;
+  font-size:1rem;
+  box-sizing:border-box;   /* evita diferença por borda */
+}
+
+.search-box input{
+  background:#020617;
+  color:#fff;
+}
+
+.search-box .btn-search{
+  background:#334155;
+  color:#fff;
+}
 #painelCliente{display:none;background:var(--card);padding:15px;border-radius:12px;border:1px solid #334155}
 .info-row{display:flex;justify-content:space-between;margin-bottom:6px;font-size:.9rem}
 .label{color:#94a3b8}.val{font-weight:700;color:#fde047}
@@ -31,7 +61,7 @@ small{color:#94a3b8}
 <h2>PROJETO AURA – CÓDIGO ZERO</h2>
 
 <div class="upload-area">
-  <small id="nomeArquivo">Nenhum arquivo carregado</small>
+  <small id="nomeArquivo">Nenhum arquivo carregado</small><p>
   <label class="btn btn-upload">
     📂 CARREGAR TXT
     <input type="file" id="inputTxt" accept=".txt" hidden>
@@ -39,7 +69,7 @@ small{color:#94a3b8}
 </div>
 
 <div class="search-box">
-  <input id="idBusca" placeholder="Nº Cliente ou Medidor" inputmode="numeric">
+  <input id="idBusca" placeholder="Nome do Cliente ou Nº Medidor" inputmode="numeric">
   <button class="btn btn-search" onclick="buscar()">🔍</button>
 </div>
 

@@ -2,364 +2,70 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SITE EM CONSTRUÇÃO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA EM MANUTENÇÃO</title>
     <style>
-        /* CSS DA CAPA DE PROTEÇÃO */
-        #capa-secreta {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background-color: #000; color: #b19cd9;
-            font-family: 'Arial Black', sans-serif; text-align: center;
-            z-index: 9999; overflow: hidden;
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #000; /* Começa no preto */
+            color: #b19cd9; /* Lilás sólido, sem brilho */
+            font-family: 'Arial Black', sans-serif;
+            text-align: center;
+            overflow: hidden;
+            /* Animação de 0.2s para um efeito de alerta rápido */
             animation: alertaEscarlate 0.7s infinite;
         }
 
         @keyframes alertaEscarlate {
             0% { background-color: #000; }
-            100% { background-color: #d60606; }
+            100% { background-color: #d60606; } /* Seu Vermelho Escarlate */
         }
 
-        .aviso h1 { font-size: 2.5em; margin: 0; color: #b19cd9; line-height: 1.1; }
-        .aviso p { font-size: 1.5em; font-weight: bold; margin-top: 10px; }
-        .icones { font-size: 4em; margin-top: 20px; cursor: default; }
-
-         #portal-invisivel {
-            position: absolute;
-            bottom: 20%; width: 150px; height: 100px;
-            background: transparent; border: none; outline: none;
-            cursor: default; z-index: 10000;
+        .aviso {
+            z-index: 10;
+            padding: 20px;
         }
 
-        /* ESTILOS DO PROJETO AURA */
-        :root { --bg:#0f172a; --card:#1e293b; --accent:#3b82f6; --success:#22c55e; --text:#f1f5f9; }
-        #projeto-aura-content { 
-            display: none; 
-            min-height: 100vh;
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: system-ui, -apple-system, sans-serif; 
-            padding: 15px; 
-            box-sizing: border-box;
+        h1 {
+            font-size: 3.5em;
+            margin: 0;
+            line-height: 1;
+            /* Lilás puro, sem text-shadow para evitar luminosidade */
+            color: #b19cd9; 
         }
-        .container { max-width: 520px; margin: auto; }
-        .upload-area-aura { border: 2px dashed var(--accent); padding: 20px; text-align: center; border-radius: 12px; background: var(--card); margin-bottom: 15px; }
-        .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: 700; font-size: 1rem; margin-top: 10px; cursor: pointer; }
-        .btn-upload { background: var(--accent); color: #fff; }
-        .btn-apply { background: var(--success); color: #fff; }
-        .btn-search { background: #334155; color: #fff; flex: 1; height: 48px; border-radius: 10px; }
-        .search-box { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
-        .search-box input { flex: 2; height: 48px; padding: 0 12px; border-radius: 10px; border: 1px solid #334155; background: #020617; color: #fff; font-size: 1rem; }
-        #painelCliente { display: none; background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; }
-        .info-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: .9rem; }
-        .label { color: #94a3b8; }
-        .val { font-weight: 700; color: #fde047; }
-        .history-item { background: #334155; padding: 10px; border-radius: 8px; margin-bottom: 6px; font-size: .8rem; display: flex; justify-content: space-between; }
-        small { color: #94a3b8; display: block; margin-bottom: 5px; }
+
+        p {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .icones {
+            font-size: 4em;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <div id="capa-secreta">
-        <div class="aviso">
-<div style="cursor:pointer; font-size: 24px;" onclick="mostrarProverbio()">💪 BUSCAR INSPIRAÇÃO 💪</div><p>           
- <h1>SITE AINDA EM CONSTRUÇÃO.</h1>
-            <p>VOLTE EM OUTRO DIA!</p>       
-            <div class="icones">⚠️🚧🛠️⚠️</div>
-        </div><p><p><p>
-        <button id="portal-invisivel" onclick="acessarProjeto()"></button>
-    </div>
-
-    <div id="projeto-aura-content">
-        <div class="container">
-            <h2 style="text-align:center; color:var(--accent); letter-spacing: 1px;">PROJETO CÓDIGO ZERO</h2>
-
-            <div class="upload-area-aura">
-                <small id="nomeArquivo">Nenhum arquivo carregado</small>
-                <p><label class="btn btn-upload">
-                    📂 CARREGAR 📂
-                    <input type="file" id="inputTxt" accept=".txt" hidden>
-                </label>
-            </div>
-
-            <div class="search-box">
-                <input id="idBusca" placeholder="Nome, N° Cliente ou Medidor" inputmode="text">
-                <button class="btn-search" onclick="buscar()">BUSCAR 🔍</button>
-            </div>
-
-            <div id="painelCliente">
-                <div id="nomeCliente" style="color:var(--accent); font-weight:800; margin-bottom:10px; font-size: 1.1rem;"></div>
-                <div class="info-row"><span class="label">Medidor:</span><span class="val" id="valMedidor"></span></div>
-                <div class="info-row"><span class="label">Última leitura:</span><span class="val" id="valULeitura"></span></div>
-                <div class="info-row"><span class="label">Média anterior:</span><span class="val" id="valMediaAnt"></span></div>
-                <div class="info-row"><span class="label">Nova leitura (simulação):</span><span class="val" id="valNova" style="color: #22c55e;"></span></div>
-                 <div class="info-row"><span class="label">Coordenadas:</span><span class="val" id="valCoord" style="color: #22c55e;"></span></div>
-                <button class="btn btn-apply" onclick="aplicarMedia()">✅ APLICAR MÉDIA</button>
-            </div>
-
-            <div style="margin-top:15px">
-                <small>ÚLTIMAS 3 MÉDIAS APLICADAS (DESTE CLIENTE)</small>
-                <div id="listaHistorico"></div>
-            </div>
-            
-            <p style="text-align:center; font-size: 0.7rem; color:#475569; margin-top: 30px;">Todos os direitos reservados!</p>
-        </div>
+    <div class="aviso">
+        <h1>ALGUMA COISA QUEBROU.</h1>
+        <p>VOLTE MAIS TARDE!</p>
+        <div class="icones">⚠️ 🚧 🛠️ ⚠️</div>
     </div>
 
     <script>
-        // --- LÓGICA DE ACESSO ---
+        // Trava a animação após 1 minuto (60.000ms)
         setTimeout(() => {
-            const capa = document.getElementById('capa-secreta');
-            if(capa) {
-                capa.style.animation = "none";
-                capa.style.backgroundColor = "#d60606";
-            }
+            document.body.style.animation = "none";
+            document.body.style.backgroundColor = "#d60606"; // Fixa no seu escarlate
         }, 60000);
-
-
-
-const proverbios = [
-"O que prepara o seu caminho com prudência terá sucesso.<br>(Provérbios 16:3)",
-"Consagre ao Senhor tudo o que você faz, e os seus planos serão bem-sucedidos.<br>(Provérbios 16:3)",
-"A soberba precede a ruína, mas a humildade precede a honra.<br>(Provérbios 18:12)",
-"Onde não há conselhos os projetos fracassam, mas com muitos conselheiros há sucesso.<br>(Provérbios 15:22)",
-"O prudente vê a dificuldade e se prepara.<br>(Provérbios 22:3)",
-"O que domina o seu espírito é melhor do que o que conquista uma cidade.<br>(Provérbios 16:32)",
-"Os planos do diligente conduzem à fartura.<br>(Provérbios 21:5)",
-"O coração do sábio busca o conhecimento.<br>(Provérbios 18:15)",
-"A perseverança deve ter ação completa.<br>(Tiago 1:4)",
-"A disciplina, no momento, não parece motivo de alegria.<br>(Hebreus 12:11)",
-"Os que esperam no Senhor renovam as suas forças.<br>(Isaías 40:31)",
-"A sabedoria clama nas ruas.<br>(Provérbios 1:20)",
-"Aquele que perseverar até o fim será salvo.<br>(Mateus 24:13)",
-"O que anda com os sábios será sábio.<br>(Provérbios 13:20)",
-"Antes da honra vem a humildade.<br>(Provérbios 15:33)",
-"Nenhum vento ajuda quem não sabe para onde vai.<br>(Sêneca)",
-"A disciplina é a alma do sucesso.<br>(George Washington)",
-"Suportar dificuldades é parte do treinamento.<br>(Epicteto)",
-"Somos o que repetidamente fazemos.<br>(Aristóteles)",
-"Aquele que vence a si mesmo é poderoso.<br>(Lao-Tsé)",
-"Sem disciplina, não há liberdade.<br>(Aristóteles – paráfrase)",
-"O sofrimento é o preço da grandeza.<br>(Winston Churchill)",
-"A constância transforma o impossível em inevitável.<br>(Napoleão Bonaparte)",
-"O homem se mede pela resistência.<br>(Friedrich Nietzsche)",
-"Primeiro controle a si mesmo.<br>(Marco Aurélio)",
-"O hábito deve ser mais forte que a vontade.<br>(William James)",
-"Quem evita o esforço, teme o progresso.<br>(Provérbio árabe)",
-"A mente disciplinada é invencível.<br>(Estoicismo)",
-"Nada fortalece tanto quanto suportar.<br>(Sêneca)",
-"A perseverança é a mãe do êxito.<br>(Provérbio europeu)",
-"A dor é temporária; o saldo dela é permanente.<br>(Autor desconhecido)",
-"O esforço diário constrói a vitória silenciosa.<br>(Provérbio japonês)",
-"A persistência forma líderes.<br>(Tradição espartana)",
-"A excelência é um hábito.<br>(Aristóteles)",
-"Disciplina é agir apesar da vontade.<br>(Autor desconhecido)",
-"A constância vence a intensidade.<br>(Autor desconhecido)",
-"A disciplina elimina a preguiça.<br>(Autor desconhecido)",
-"Quem suporta o processo herda o resultado.<br>(Autor desconhecido)",
-"Nada cresce na distração.<br>(Autor desconhecido)",
-"A disciplina sustenta quando a vontade atrapalha.<br>(Autor desconhecido)",
-"A perseverança molda o caráter.<br>(Autor desconhecido)",
-"O esforço silencioso constrói o futuro.<br>(Autor desconhecido)",
-"O hábito correto corrige o dia ruim.<br>(Autor desconhecido)",
-"Quem aguenta o processo, aprende, e quem aprende, vence.<br>(Autor desconhecido)"
-];
-
-function mostrarProverbio() {
-    // Sorteia um provérbio
-    const p = proverbios[Math.floor(Math.random() * proverbios.length)];
-    
-    // Cria um overlay temporário vistoso
-    const msg = document.createElement('div');
-    msg.style = "position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:10000; display:flex; align-items:center; justify-content:center; padding:40px; text-align:center; flex-direction:column; animation: fadeIn 0.5s;";
-    
-    msg.innerHTML = `
-        <div style="font-size:1.5em; color:var(--yellow); font-weight:800; line-height:1.6; text-shadow: 0 0 15px gold;">
-            "${p}"
-        </div>
-        <button class="menu-btn" style="margin-top:40px; width:200px; border-color:var(--success); color:var(--success)" onclick="this.parentElement.remove()">FIQUEI INSPIRADO!</button>
-    `;
-    
-    document.body.appendChild(msg);
-}
-
-  // --- LÓGICA DE ACESSO ---
-
-function acessarProjeto() {
-    const senha = prompt("AMIGO LEITURISTA, DIGITE O SEU BR:");
-    if (!senha) return;
-
-    const idLimpo = senha.trim();
-
-    // L(Base64)
- 
-    const vipsOfuscados = [
-      "MDMyMjk=", "MDkwODg5", "NTk0ODcw", "NjExMg==", 
-        "OTgxOTQ4", "MTQwNw==", "NDE1Mg==", "NTU1NTU1ODM=", 
-        "NDQ0NDQ4NjI=", "MjIyMjIyMzg5"
-    ];
-
-    // Decodifica a lista para comparação
-    const vipsDecodificados = vipsOfuscados.map(v => atob(v));
-
-    // Esconde a capa escarlate
-    document.getElementById('capa-secreta').style.display = "none";
-    document.getElementById('projeto-aura-content').style.display = "block";
-    document.body.style.backgroundColor = "#0f172a"; 
-
-    // CORTINA DE FUMAÇA
-    if (!vipsDecodificados.includes(idLimpo)) {
-        document.getElementById('projeto-aura-content').innerHTML = `
-            <div style="max-width:520px; margin: 100px auto; text-align:center;">
-                <h2 style="color:#3b82f6; opacity: 0.5;">PROJETO AURA</h2>
-                <p style="color:#94a3b8; font-style: italic;">Status: Servidor em manutenção programada.</p>
-                <p style="color:#475569; font-size: 0.8rem; margin-top: 50px;">AMIGO LEITURISTA, SEJA BEM VINDO!<br>PROJETO EM CONSTRUÇÃO...</p>
-            </div>
-        `;
-        console.log("Seja bem vindo. Projeto em Construção");
-    } else {
-        alert("Seja bem vindo à Fabrica de Leitura.");
-    }
-}
-
-
-
-        // --- LÓGICA DO PROJETO AURA ---
-        let base = [];
-
- document.getElementById('inputTxt').addEventListener('change', e => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = ev => {
-        const linhas = ev.target.result.split(/\r?\n/);
-
-        base = linhas.map(linha => {
-            if (!linha || !linha.includes(';')) return null;
-
-            const limpa = linha.replace(/\r/g, '');
-            const p = limpa.split(';');
-
-            // Mapeamento Principal
-            const nc = p[0]?.trim();
-            const nome = p[15]?.trim();
-            const medidor = p.find(x => x && x.includes('-')) || '';
-            const idxSim = p.findIndex(x => x === 'Sim');
-            
-            let uLeitura = '', mediaAnt = '';
-            if (idxSim !== -1) {
-                uLeitura = p[idxSim + 1] || '';
-                mediaAnt = p[idxSim + 2] || '';
-            }
-
-            // --- CORREÇÃO DAS COORDENADAS ---
-            // Captura lat e lng das colunas 50 e 51 (índices 49 e 50)
-            const lat = p[49]?.trim();
-            const lng = p[50]?.trim();
-
-            return { 
-                linha: limpa.toUpperCase(), 
-                nc, 
-                nome, 
-                medidor, 
-                uLeitura: uLeitura.trim(), 
-                mediaAnt: mediaAnt.trim(),
-                lat: lat, // Adicionado explicitamente
-                lng: lng  // Adicionado explicitamente
-            };
-        }).filter(Boolean);
-
-        document.getElementById('nomeArquivo').innerText = `Base: ${file.name} (${base.length} registros)`;
-        alert("Aura: Base atualizada com coordenadas!");
-    };
-    reader.readAsText(file, "UTF-8");
-});
-
-
-function buscar() {
-    const termo = document.getElementById('idBusca').value.trim().toUpperCase();
-    if (!termo) return alert("Digite algo.");
-    
-    const c = base.find(item => item.linha.includes(termo));
-    if (!c) return alert("Nada encontrado.");
-
-    const u = parseInt((c.uLeitura || '').replace(/\D/g, '')) || 0;
-    const m = parseInt((c.mediaAnt || '').replace(/\D/g, '')) || 0;
-    const nova = u + m;
-
-    // --- TRATAMENTO DAS COORDENADAS PARA O GOOGLE MAPS ---
-    // Substituí a vírgula decimal por ponto para o GPS entender
-    const latFix = (c.lat || '').replace(',', '.');
-    const lngFix = (c.lng || '').replace(',', '.');
-    const coordsGoogle = `${latFix},${lngFix}`;
-
-    document.getElementById('painelCliente').style.display = 'block';
-    document.getElementById('nomeCliente').innerText = c.nome || '(sem nome)';
-    document.getElementById('valMedidor').innerText = c.medidor || '-';
-    document.getElementById('valULeitura').innerText = u;
-    document.getElementById('valMediaAnt').innerText = m;
-    document.getElementById('valNova').innerText = nova;
-    
-    const elCoord = document.getElementById('valCoord');
-    if(elCoord) {
-        // Exibe com a vírgula original para o utilizador ler como no TXT
-        elCoord.innerText = `${c.lat}, ${c.lng}`;
-        
-        // No clique, envia à coordenada do Google Maps
-        elCoord.style.color = "#3b82f6";
-        elCoord.style.textDecoration = "underline";
-        elCoord.onclick = () => {
-            if(latFix && lngFix) {
-                // Link oficial para abrir no GPS
-                window.open(`https://www.google.com/maps/search/?api=1&query=${coordsGoogle}`, '_blank');
-            } else {
-                alert("Coordenadas inválidas para este cliente.");
-            }
-        };
-    }
-
-    renderHistoricoCliente(c.nc);
-    document.getElementById('painelCliente').dataset.nc = c.nc;
-}
-
-
-        function aplicarMedia() {
-            const painel = document.getElementById('painelCliente');
-            const nc = painel.dataset.nc;
-            if (!nc) return;
-            const ultima = parseInt(document.getElementById('valULeitura').innerText) || 0;
-            const media = parseInt(document.getElementById('valMediaAnt').innerText) || 0;
-            const nova = ultima + media;
-            salvarHistorico(nc, ultima, media, nova);
-            renderHistoricoCliente(nc);
-            alert("Média aplicada!");
-        }
-
-        function salvarHistorico(nc, ultima, media, nova) {
-            let historico = JSON.parse(localStorage.getItem('historicoClientes')) || {};
-            if (!historico[nc]) historico[nc] = [];
-            historico[nc].unshift({ data: new Date().toLocaleString("pt-BR"), mediaAplicada: media, ultima, nova });
-            if (historico[nc].length > 3) historico[nc].pop();
-            localStorage.setItem('historicoClientes', JSON.stringify(historico));
-        }
-
-        function renderHistoricoCliente(nc) {
-            const box = document.getElementById('listaHistorico');
-            box.innerHTML = "";
-            const historico = JSON.parse(localStorage.getItem('historicoClientes')) || {};
-            const lista = historico[nc] || [];
-            if (!lista.length) {
-                box.innerHTML = "<small>Nenhuma média aplicada ainda.</small>";
-                return;
-            }
-            lista.forEach(h => {
-                const d = document.createElement('div');
-                d.className = 'history-item';
-                d.innerHTML = `<span>${h.data}</span><span><strong>${h.nova}</strong> (${h.ultima}+${h.mediaAplicada})</span>`;
-                box.appendChild(d);
-            });
-        }
     </script>
+
 </body>
 </html>

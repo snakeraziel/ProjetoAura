@@ -73,7 +73,7 @@
 
     <div id="projeto-aura-content">
         <div class="container">
-            <h2 style="text-align:center; color:var(--accent); letter-spacing: 1px;">PROJETO AURA – CÓDIGO ZERO</h2>
+            <h2 style="text-align:center; color:var(--accent); letter-spacing: 1px;">PROJETO AURA</h2>
 
             <div class="upload-area-aura">
                 <small id="nomeArquivo">Nenhum arquivo carregado</small>
@@ -84,8 +84,8 @@
             </div>
 
             <div class="search-box">
-                <input id="idBusca" placeholder="Nome, N° Cliente ou Nº Medidor" inputmode="text">
-                <button class="btn-search" onclick="buscar()">🔍 BUSCAR 🔍</button>
+                <input id="idBusca" placeholder="Nome, N° Cliente ou Medidor" inputmode="text">
+                <button class="btn-search" onclick="buscar()">BUSCAR 🔍</button>
             </div>
 
             <div id="painelCliente">
@@ -99,7 +99,7 @@
             </div>
 
             <div style="margin-top:15px">
-                <small>ÚLTIMAS 3 MÉDIAS APLICADAS (DESTE CLIENTE)</small>
+                <small>ÚLTIMAS 3 APLICAÇÕES (DESTE CLIENTE)</small>
                 <div id="listaHistorico"></div>
             </div>
             
@@ -208,7 +208,7 @@ function acessarProjeto() {
     document.getElementById('projeto-aura-content').style.display = "block";
     document.body.style.backgroundColor = "#0f172a"; 
 
-    // CORTINA DE FUMAÇA
+    // CORTINA
     if (!vipsDecodificados.includes(idLimpo)) {
         document.getElementById('projeto-aura-content').innerHTML = `
             <div style="max-width:520px; margin: 100px auto; text-align:center;">

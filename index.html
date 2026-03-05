@@ -83,7 +83,7 @@
                 </label>
             </div>
 
-        <!--    <div class="search-box">
+    <!--       <div class="search-box">
                 <input id="idBusca" placeholder="Nome, N° Cliente ou Medidor" inputmode="text">
                 <button class="btn-search" onclick="buscar()">BUSCAR 🔍</button>
             </div> -->
@@ -93,15 +93,21 @@
     <button class="btn-search" onclick="buscarCliente()">BUSCAR 🔎</button>
 </div>
 
-            <div id="painelCliente">
-                <div id="nomeCliente" style="color:var(--accent); font-weight:800; margin-bottom:10px; font-size: 1.1rem;"></div>
-                <div class="info-row"><span class="label">Medidor:</span><span class="val" id="valMedidor"></span></div>
-                <div class="info-row"><span class="label">Última leitura:</span><span class="val" id="valULeitura"></span></div>
-                <div class="info-row"><span class="label">Média anterior:</span><span class="val" id="valMediaAnt"></span></div>
-                <div class="info-row"><span class="label">Nova leitura (simulação):</span><span class="val" id="valNova" style="color: #22c55e;"></span></div>
-                 <div class="info-row"><span class="label">Coordenadas:</span><span class="val" id="valCoord" style="color: #22c55e;"></span></div>
-                <button class="btn btn-apply" onclick="aplicarMedia()">✅ APLICAR MÉDIA</button>
-            </div>
+   <div id="painelCliente">
+    <div id="nomeCliente" style="color:var(--accent); font-weight:800; margin-bottom:10px; font-size: 1.1rem;"></div>
+    <div class="info-row"><span class="label">Nº do Cliente:</span><span class="val" id="valNC"></span></div>
+    <div class="info-row"><span class="label">Nº do Medidor:</span><span class="val" id="valMedidor"></span></div>
+    <div class="info-row"><span class="label">Última Leitura:</span><span class="val" id="valULeitura"></span></div>
+    <div class="info-row"><span class="label">Média Anterior:</span><span class="val" id="valMediaAnt"></span></div>
+    <div class="info-row"><span class="label">Nova Leitura (Simulação):</span><span class="val" id="valNova" style="color: #22c55e;"></span></div>
+    <div class="info-row"><span class="label">Procedimento de Entrega:</span><span class="val" id="valProcEntrega"></span></div>
+    <div class="info-row"><span class="label">Código Principal:</span><span class="val" id="valCodPrincipal"></span></div>
+    <div class="info-row"><span class="label">Código Secundário:</span><span class="val" id="valCodSecundario"></span></div>
+    <div class="info-row"><span class="label">Coordenadas:</span><span class="val" id="valCoord"></span></div>
+    <button class="btn btn-apply" onclick="aplicarMedia()">✅ APLICAR MÉDIA</button>
+</div>
+
+
 
             <div style="margin-top:15px">
                 <small>ÚLTIMAS 3 APLICAÇÕES (DESTE CLIENTE)</small>
@@ -232,194 +238,82 @@ function acessarProjeto() {
 
 
 
-        // --- LÓGICA DO PROJETO AURA ---
+// --- CARREGAMENTO DO ARQUIVO ---
+let base = [];
 
 document.getElementById('inputTxt').addEventListener('change', e => {
     const file = e.target.files[0];
     const reader = new FileReader();
-
     reader.onload = ev => {
         const linhas = ev.target.result.split(/\r?\n/);
-
-        // Aqui a mágica acontece: mapeamos a base uma única vez de forma correta
-        base = linhas.map(linha => {
-            if (!linha || !linha.includes(';')) return null;
-
-            const limpa = linha.replace(/\r/g, '');
-            const p = limpa.split(';');
-
-            // Pegamos os dados pelas posições fixas (índices) que não mentem
-            const nc = p[0]?.trim();
-            const nome = p[15]?.trim();
-            const medidorFull = p[30]?.trim() || ''; 
-            const medidor = medidorFull.split('-')[0];
-            
-            // INDEPENDENTE de "Sim" ou "Nao", a leitura e média estão aqui:
-            const uLeitura = p[32]?.trim() || '0';
-            const mediaAnt = p[33]?.trim() || '0';
-
-            // Coordenadas
-            const lat = p[49]?.trim();
-            const lng = p[50]?.trim();
-
-            return { 
-                linha: limpa.toUpperCase(), 
-                nc, 
-                nome, 
-                medidor, 
-                uLeitura, 
-                mediaAnt,
-                lat,
-                lng 
-            };
-        }).filter(Boolean);
-
+        // Filtra apenas as linhas que contêm dados reais (separados por ;)
+        base = linhas.filter(l => l.includes(';'));
         document.getElementById('nomeArquivo').innerText = `Base: ${file.name} (${base.length} registros)`;
-        alert("Aura: Base carregada e mapeada com sucesso!");
+        alert("Aura: Base mapeada com sucesso!");
     };
     reader.readAsText(file, "UTF-8");
 });
-
-    reader.onload = ev => {
-    const linhas = ev.target.result.split(/\r?\n/);
-
-    base = linhas.map(linha => {
-        if (!linha || !linha.includes(';')) return null;
-
-        const limpa = linha.replace(/\r/g, '');
-        const p = limpa.split(';');
-
-        // MAPEAMENTO POR ÍNDICES FIXOS (Mais seguro para Email/GD)
-        const nc = p[0]?.trim();
-        const nome = p[15]?.trim();
-        const medidorFull = p[30]?.trim() || ''; // Ex: 11529290-ELE-725
-        const medidor = medidorFull.split('-')[0]; // Pega só o número antes do traço
-        
-        // LEITURA E MÉDIA (Posições 32 e 33 da string)
-        const uLeitura = p[32]?.trim() || '0';
-        const mediaAnt = p[33]?.trim() || '0';
-
-        // COORDENADAS (Posições 49 e 50)
-        const lat = p[49]?.trim();
-        const lng = p[50]?.trim();
-
-        return { 
-            linha: limpa.toUpperCase(), 
-            nc, 
-            nome, 
-            medidor, 
-            uLeitura, 
-            mediaAnt,
-            lat,
-            lng 
-        };
-    }).filter(Boolean);
-
-    document.getElementById('nomeArquivo').innerText = `Base: ${file.name} (${base.length} registros)`;
-    alert("Aura: Base mapeada com sucesso!");
-};
-
-
-// --- BUSCA UNIFICADA (Melhorada) ---
-function buscar() {
-    const termo = document.getElementById('idBusca').value.trim().toUpperCase();
-    if (!termo) return alert("Digite algo.");
-    
-    // Procura na 'base' que foi carregada pelo arquivo TXT
-    const c = base.find(item => item.linha.includes(termo));
-    if (!c) return alert("Nada encontrado.");
-
-    const u = parseInt((c.uLeitura || '').replace(/\D/g, '')) || 0;
-    const m = parseInt((c.mediaAnt || '').replace(/\D/g, '')) || 0;
-    const nova = u + m;
-
-    // Tratamento de Coordenadas
-    const latFix = (c.lat || '').replace(',', '.').trim();
-    const lngFix = (c.lng || '').replace(',', '.').trim();
-    const coordsGoogle = `${latFix},${lngFix}`;
-
-    // Preenchimento do Painel
-    document.getElementById('painelCliente').style.display = 'block';
-    document.getElementById('nomeCliente').innerText = c.nome || '(sem nome)';
-    document.getElementById('valMedidor').innerText = c.medidor || '-';
-    document.getElementById('valULeitura').innerText = u;
-    document.getElementById('valMediaAnt').innerText = m;
-    document.getElementById('valNova').innerText = nova;
-    
-    const elCoord = document.getElementById('valCoord');
-    if(elCoord) {
-        elCoord.innerText = (latFix && lngFix) ? `${c.lat}, ${c.lng}` : "Não disponível";
-        elCoord.style.color = "#3b82f6";
-        elCoord.style.textDecoration = "underline";
-        elCoord.style.cursor = "pointer";
-        
-        elCoord.onclick = () => {
-            if(latFix && lngFix) {
-                // Link oficial para abrir direto no App do GPS
-                window.open(`https://www.google.com/maps/search/?api=1&query=${coordsGoogle}`, '_blank');
-            } else {
-                alert("Coordenadas inválidas para este cliente.");
-            }
-        };
-    }
-
-    renderHistoricoCliente(c.nc);
-    document.getElementById('painelCliente').dataset.nc = c.nc;
-}
-
 
 function buscarCliente() {
     const termo = document.getElementById("busca").value.trim().toUpperCase();
     if (!termo) return;
 
-    // Busca na base (ou base.linha se você usou o mapeamento do reader)
-    const item = base.find(i => (i.linha || i).includes(termo));
+    const linhaEncontrada = base.find(l => l.toUpperCase().includes(termo));
+    if (!linhaEncontrada) return alert("Cliente não encontrado.");
 
-    if (!item) {
-        alert("Cliente não encontrado.");
-        return;
-    }
+    const p = linhaEncontrada.split(';');
 
-    // Pega a linha bruta
-    const linhaBruta = item.linha || item;
-    const campos = linhaBruta.split(";");
-
-    // MAPEAMENTO FORÇADO
-    const nc = campos[0] ? campos[0].trim() : "N/A";
-    const nome = campos[15] ? campos[15].trim() : "—";
+    // MAPEAMENTO BASEADO NA SUA STRING REAL
+    const nc = p[0]?.trim();                // Posição 0
+    const nome = p[15]?.trim();              // Posição 15
+    const medidorFull = p[30]?.trim() || ""; // Posição 30
+    const medidor = medidorFull.split('-')[0];
+    const leitura = p[32]?.trim() || "0";    // Posição 32
+    const media = p[33]?.trim() || "0";      // Posição 33
+    const nova = (parseInt(leitura) || 0) + (parseInt(media) || 0);
     
-    // Medidor (Coluna 30)
-    const medidorFull = campos[30] || "";
-    const medidor = medidorFull.split("-")[0].trim();
-    
-    // Leitura e Média (Colunas 32 e 33)
-    const leitura = parseInt(campos[32]) || 0; 
-    const media = parseInt(campos[33]) || 0; 
-    const simulacao = leitura + media;
+    // CAMPOS ADICIONAIS
+    const procEntrega = p[18]?.trim() || "CORTADO/VAZIO"; // Posição 25 na sua string
+    const codPrincipal = p[6]?.trim() || "000";          // Posição 6
+    const codSecundario = p[48]?.trim() || "000";        // Posição 48
+    const lat = p[49]?.trim() || "";                     // Posição 49
+    const lng = p[50]?.trim() || "";                     // Posição 50
 
-    // ALIMENTAÇÃO DA TELA
+    // PREENCHIMENTO DO PAINEL
     document.getElementById("nomeCliente").innerText = nome;
+    document.getElementById("valNC").innerText = nc;
     document.getElementById("valMedidor").innerText = medidor;
     document.getElementById("valULeitura").innerText = leitura;
     document.getElementById("valMediaAnt").innerText = media;
-    document.getElementById("valNova").innerText = simulacao;
-    
-    // Força a exibição do NC se o campo existir
-    const campoNC = document.getElementById("valNC");
-    if (campoNC) campoNC.innerText = nc;
+    document.getElementById("valNova").innerText = nova;
+    document.getElementById("valProcEntrega").innerText = procEntrega === "" ? "CORTADO" : procEntrega;
+    document.getElementById("valCodPrincipal").innerText = codPrincipal;
+    document.getElementById("valCodSecundario").innerText = codSecundario;
 
-    // DATASET PARA O HISTÓRICO
-    const painel = document.getElementById('painelCliente');
-    painel.style.display = "block";
-    painel.dataset.nc = nc;
+    // CONFIGURAÇÃO DO LINK DAS COORDENADAS
+    const elCoord = document.getElementById("valCoord");
+    if (lat && lng) {
+        elCoord.innerText = `${lat}, ${lng}`;
+        elCoord.style.color = "#3b82f6";
+        elCoord.style.textDecoration = "underline";
+        elCoord.style.cursor = "pointer";
+        elCoord.onclick = () => {
+            const latFix = lat.replace(',', '.');
+            const lngFix = lng.replace(',', '.');
+            window.open(`https://www.google.com/maps?q=${latFix},${lngFix}`, '_blank');
+        };
+    } else {
+        elCoord.innerText = "Não disponível";
+        elCoord.onclick = null;
+        elCoord.style.textDecoration = "none";
+    }
 
-    console.log("Aura detectou NC:", nc); // Verifique no F12
-    
+    document.getElementById("painelCliente").style.display = "block";
+    document.getElementById("painelCliente").dataset.nc = nc;
     renderHistoricoCliente(nc);
 }
 
-
-        function aplicarMedia() {
+function aplicarMedia() {
             const painel = document.getElementById('painelCliente');
             const nc = painel.dataset.nc;
             if (!nc) return;
@@ -431,7 +325,8 @@ function buscarCliente() {
             alert("Média aplicada!");
         }
 
-        function salvarHistorico(nc, ultima, media, nova) {
+
+function salvarHistorico(nc, ultima, media, nova) {
             let historico = JSON.parse(localStorage.getItem('historicoClientes')) || {};
             if (!historico[nc]) historico[nc] = [];
             historico[nc].unshift({ data: new Date().toLocaleString("pt-BR"), mediaAplicada: media, ultima, nova });
@@ -439,7 +334,7 @@ function buscarCliente() {
             localStorage.setItem('historicoClientes', JSON.stringify(historico));
         }
 
-        function renderHistoricoCliente(nc) {
+function renderHistoricoCliente(nc) {
             const box = document.getElementById('listaHistorico');
             box.innerHTML = "";
             const historico = JSON.parse(localStorage.getItem('historicoClientes')) || {};

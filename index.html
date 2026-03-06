@@ -79,14 +79,14 @@
     <small id="nomeArquivo">Nenhum arquivo carregado</small>
 
     <p>
-        <span id="btnCamera" style="cursor:pointer; font-size:25px; margin-right:65px;">👁</span>
+        <span id="btnCamera" style="cursor:pointer; font-size:30px; margin-right:15px;">👁</span>
 
         <label class="btn btn-upload">
             📂 CARREGAR 📂
             <input type="file" id="inputTxt" accept=".txt" hidden>
         </label>
 
-<button onclick="abrirBloco()" style="background:none;border:none;font-size:25px;margin-left:65px;">
+<button onclick="abrirBloco()" style="background:none;border:none;font-size:30px;margin-left:15px;">
 📃
 </button
     </p>
@@ -209,22 +209,41 @@ function mostrarProverbio() {
 
 let cameraAtiva = false;
 let streamCamera = null;
+let mediaRecorder = null;
+let chunks = [];
 
 const btnCamera = document.getElementById("btnCamera");
 
 btnCamera.onclick = async () => {
+
     if (!cameraAtiva) {
+
         try {
             streamCamera = await navigator.mediaDevices.getUserMedia({ video: true });
-            btnCamera.textContent = "🔴";
+            mediaRecorder = new MediaRecorder(streamCamera);
+            chunks = [];
+            mediaRecorder.ondataavailable = e => {
+                chunks.push(e.data);
+            };
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunks, { type: "video/webm" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "gravacao.webm";
+                a.click();
+            };
+            mediaRecorder.start();
+            btnCamera.style.color = "red";
             btnCamera.title = "Parar gravação";
             cameraAtiva = true;
         } catch (erro) {
             alert("Câmera não permitida ou indisponível.");
         }
     } else {
+        mediaRecorder.stop();
         streamCamera.getTracks().forEach(track => track.stop());
-        btnCamera.textContent = "👁";
+        btnCamera.style.color = "black";
         btnCamera.title = "Iniciar gravação";
         cameraAtiva = false;
     }
@@ -301,7 +320,7 @@ function buscarCliente() {
     const nome = p[15]?.trim();              // Posição 15 
   /*  const medidorFull = p[29]?.trim() || "";
     const medidor = medidorFull.split('-')[0]; */
-   const medidor = p[29]?.trim() || "";
+   const medidor = p[29]?.trim() || "";    // Posição 30
     const leitura = p[32]?.trim() || "0";    // Posição 32 
     const media = p[33]?.trim() || "0";      // Posição 33 
     const nova = (parseInt(leitura) || 0) + (parseInt(media) || 0);
@@ -457,7 +476,7 @@ padding:20px;
 
 <div style="max-width:600px;margin:auto">
 
-<h3 style="color:#3b82f6;margin-bottom:10px;">📃 BLOCO DE NOTAS</h3>
+<h3 style="color:#3b82f6;margin-bottom:10px;">📃 BLOCO DE NOTAS ✍</h3>
 
 <textarea id="areaNotas" style="
 width:100%;

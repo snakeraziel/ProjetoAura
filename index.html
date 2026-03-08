@@ -263,16 +263,27 @@ document.getElementById('inputTxt').addEventListener('change', e => {
 
 // --- BUSCA E NAVEGAÇÃO ---
 function buscarCliente() {
-    const termo = document.getElementById("busca").value.trim().toUpperCase();
-    if (!termo || base.length === 0) return;
+    // Ajustado para garantir que o ID 'busca' seja lido corretamente
+    const inputBusca = document.getElementById("busca");
+    if (!inputBusca) return; 
+
+    const termo = inputBusca.value.trim().toUpperCase();
+    
+    // Verifica se a base existe e se o termo não está vazio
+    if (!termo || typeof base === 'undefined' || base.length === 0) return;
+
     const index = base.findIndex(l => l.toUpperCase().includes(termo));
-    if (index === -1) return alert("CLIENTE NÃO FOI LIDO NO MÊS PASSADO.");
+    
+    if (index === -1) {
+        return alert("CLIENTE NÃO FOI LIDO NO MÊS PASSADO.");
+    }
+
     indiceGlobal = index;
     preencherPainel(base[indiceGlobal].split(';'));
 }
 
 function pular(direcao) {
-    if (base.length === 0) return alert("Carregue a base primeiro!");
+    if (typeof base === 'undefined' || base.length === 0) return alert("Carregue a base primeiro!");
     let novoIndex = indiceGlobal + direcao;
     if (novoIndex < 0) novoIndex = 0;
     if (novoIndex >= base.length) novoIndex = base.length - 1;
@@ -281,33 +292,33 @@ function pular(direcao) {
 }
 
 function preencherPainel(p) {
-    const nc = p[0]?.trim();                 
+    const nc = p[0]?.trim();                  
     const leitura = p[1]?.trim() || "0";     
     const codPrincipal = p[5]?.trim() || "0"; 
     const codigoEntrega = p[6]?.trim();      
     const nome = p[15]?.trim();               
     const medidor = p[29]?.trim() || "";      
-    const media = p[33]?.trim() || "0";       
+    const media = p[33]?.trim() || "0";        
     const nova = (parseInt(leitura) || 0) + (parseInt(media) || 0);
     const codSecundario = p[48]?.trim() || "0"; 
     const lat = p[49]?.trim() || "";          
     const lng = p[50]?.trim() || "";          
 
     const descricoesEntrega = {
-	"00": "FATURA NÃO IMPRESSA",
-	"01": "EM MÃOS",
-	"02": "AO DONO DO IMÓVEL",
-	"03": "PORTEIRO, RECEPCIONISTA",
-	"04": "AO VIZINHO",
-	"05": "EMBAIXO PORTA, JANELA",
-	"06": "FALTA DE ACESSO",
-	"07": "NO JARDIM, ÁREA LIVRE",
-	"08": "PORTA CARTA INDIVIDUAL",
-	"09": "PORTA CARTA COLETIVO",
-	"10": "RECUSOU A RECEBER",
-	"11": "RETIDA PARA CORREÇÃO",
-	"12": "IMPRESSA NA BASE",
-	"13": "RETIDA, ÁREA DE RISCO"
+        "00": "FATURA NÃO IMPRESSA",
+        "01": "EM MÃOS",
+        "02": "AO DONO DO IMÓVEL",
+        "03": "PORTEIRO, RECEPCIONISTA",
+        "04": "AO VIZINHO",
+        "05": "EMBAIXO PORTA, JANELA",
+        "06": "FALTA DE ACESSO",
+        "07": "NO JARDIM, ÁREA LIVRE",
+        "08": "PORTA CARTA INDIVIDUAL",
+        "09": "PORTA CARTA COLETIVO",
+        "10": "RECUSOU A RECEBER",
+        "11": "RETIDA PARA CORREÇÃO",
+        "12": "IMPRESSA NA BASE",
+        "13": "RETIDA, ÁREA DE RISCO"
     };
 
     const formaFinal = (!codigoEntrega || codigoEntrega === "0" || codigoEntrega === "00") 

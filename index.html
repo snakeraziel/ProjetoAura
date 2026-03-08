@@ -250,18 +250,6 @@ function acessarProjeto() {
     }
 }
 
-// --- CONTROLE DE ARQUIVO ---
-document.getElementById('inputTxt').addEventListener('change', e => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = ev => {
-        const linhas = ev.target.result.split(/\r?\n/);
-        base = linhas.filter(l => l.includes(';'));
-        document.getElementById('nomeArquivo').innerText = `Base: ${file.name} (${base.length} registros)`;
-        alert("FÁBRICA LIGADA A TODO VAPOR!");
-    };
-    reader.readAsText(file, "UTF-8");
-});
 
 // --- BUSCA E NAVEGAÇÃO ---
 function buscarCliente() {
@@ -599,39 +587,70 @@ document.addEventListener('keydown', function(e) {
 });
 
  
+
+
+
 function tentarCarregar() {
     document.getElementById('inputTxt').click();
 }
 
-document.getElementById('inputTxt').addEventListener('change', function() {
-    if (this.files.length === 0) return;
+// O evento de 'change' processa a validação 
+document.getElementById('inputTxt').addEventListener('change', function(event) {
+    const arquivo = event.target.files[0];
+    if (!arquivo) return;
 
-    const senha = prompt("PARA ATIVAR O PROJETO, DIGITE SEU BR:");
-    if (!senha) {
-        this.value = ""; // Reseta o input se cancelar
-        return;
-    }
-
-    const idLimpo = senha.trim();
+    // Prompt de segurança após a escolha do arquivo
+    const senha = prompt("DIGITE SEU BR PARA ATIVAR A AURA:");
+    
+    const idLimpo = (senha || "").trim();
     const el = document.getElementById('emojiCarga');
     const vipsDecodificados = vipsOfuscados.map(v => atob(v));
+    const containerStatus = document.getElementById('statusMensagem');
 
     if (vipsDecodificados.includes(idLimpo)) {
         // --- SUCESSO 😎 ---
         el.innerText = "😎";
         
-        // Efeito luminoso de sucesso
+        // Ativa a frase correta
+        if (containerStatus) {
+            containerStatus.innerText = "AURA ATIVADA A TODO VAPOR";
+            containerStatus.style.display = "block";
+        }
+
+        // Inicia a lógica que era do intruso, mas agora protegida
+        const reader = new FileReader();
+        reader.onload = ev => {
+            const linhas = ev.target.result.split(/\r?\n/);
+            // Filtra as linhas da base
+            base = linhas.filter(l => l.includes(';'));
+            
+            // Atualiza o contador de registros na tela
+            const infoArquivo = document.getElementById('nomeArquivo');
+            if (infoArquivo) {
+                infoArquivo.innerText = `Base: ${arquivo.name} (${base.length} registros)`;
+            }
+
+            // Dispara a exibição do primeiro registro no painel Dark
+            if (typeof mostrarRegistro === "function") {
+                mostrarRegistro(0);
+            }
+        };
+        reader.readAsText(arquivo, "UTF-8");
+
+        // Efeito visual de ativação
         document.body.style.transition = "0.3s";
         document.body.style.boxShadow = "inset 0 0 100px #064e3b";
         setTimeout(() => { document.body.style.boxShadow = "none"; }, 1000);
 
-        // Dispara a leitura real do arquivo
-        lerArquivo(this.files[0]); 
-
     } else {
-        // --- ERRO (CORTINA DE FUMAÇA) ---
-        this.value = ""; // Limpa o arquivo para não carregar nada
+        // --- ERRO (A Cortina de Fumaça) ---
+        event.target.value = ""; // Reseta o input
         el.innerText = "😳";
+        
+        if (containerStatus) {
+            containerStatus.innerText = ""; // Limpa qualquer frase
+        }
+
         setTimeout(() => {
             document.getElementById('projeto-aura-content').innerHTML = `
                 <div style="max-width:520px; margin: 100px auto; text-align:center;">
@@ -647,6 +666,8 @@ document.getElementById('inputTxt').addEventListener('change', function() {
         }, 1500);
     }
 });
+
+
 
 // 1. BLOQUEIO DE INSPEÇÃO (Ctrl+U, F12, Ctrl+Shift+I)
 /* document.addEventListener('keydown', function(e) {

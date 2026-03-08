@@ -602,44 +602,38 @@ document.addEventListener('keydown', function(e) {
 function tentarCarregar() {
     const senha = prompt("PARA ATIVAR O PROJETO, DIGITE SEU BR:");
     if (!senha) return;
-
     const idLimpo = senha.trim();
     const el = document.getElementById('emojiCarga');
     const vipsDecodificados = vipsOfuscados.map(v => atob(v));
-
     if (vipsDecodificados.includes(idLimpo)) {
+
         // --- SUCESSO 😎 ---
-        el.innerText = "😎"; 
-        
-        // Efeito de confirmação (Pisca verde rápido enquanto abre o arquivo)
-        const body = document.body;
-        let p = 0;
-        const i = setInterval(() => {
-            body.style.backgroundColor = (p % 2 === 0) ? "#064e3b" : "#050505";
-            if (++p > 5) { clearInterval(i); body.style.backgroundColor = "#050505"; }
-        }, 80);
-
-        // CLIQUE IMEDIATO (Essencial para Celular não bloquear)
-        document.getElementById('inputTxt').click(); 
-
+        el.innerText = "😎";
+        setTimeout(() => {
+            document.getElementById('inputTxt').click(); // Abre o arquivo
+            el.innerText = "🙂"; 
+        }, 0);
     } else {
-        // --- ERRO (A Cortina de Fumaça Original) ---
+        // --- ERRO 😳 ---
         el.innerText = "😳";
         setTimeout(() => {
-            document.getElementById('projeto-aura-content').innerHTML = `
-                <div style="max-width:520px; margin: 100px auto; text-align:center;">
-                    <h2 style="color:#3b82f6; opacity: 0.5;">PROJETO SECRETO AURA</h2>
-                    <p style="color:#94a3b8; font-style: italic;font-size: 1.8rem">Servidor em manutenção programada.</p>
-                    <p style="color:#475569; font-size: 0.8rem; margin-top: 50px;">AMIGO LEITURISTA, PROJETO EM CONSTRUÇÃO...</p><br>
 
-                    <button class="btn btn-apply" onclick="mostrarProverbio()">💪 BUSCAR INSPIRAÇÃO 💪</button>
-                    <br>
-                    <button onclick="location.reload()" style="cursor:pointer; font-size:20px; background:transparent; color:#475569; border:1px solid #475569; padding:8px 20px; border-radius:8px; margin-top:10px; font-weight:bold;">
-                        🚪 SAÍDA 🏃‍♂️
-                    </button>
-                </div>
+            // Aplica a mesma tela de erro/manutenção
+            document.getElementById('projeto-aura-content').innerHTML = `
+                 <div style="max-width:520px; margin: 100px auto; text-align:center;">
+                <h2 style="color:#3b82f6; opacity: 0.5;">PROJETO SECRETO AURA</h2>
+                <p style="color:#94a3b8; font-style: italic;font-size: 1.8rem">Servidor em manutenção programada.</p>
+                <p style="color:#475569; font-size: 0.8rem; margin-top: 50px;">AMIGO LEITURISTA, PROJETO EM CONSTRUÇÃO...</p><br>
+
+<button class="btn btn-apply" onclick="mostrarProverbio()">💪 BUSCAR INSPIRAÇÃO 💪</button>
+
+<button onclick="location.reload()" style="cursor:pointer; font-size:20px; background:transparent; color:#475569; border:1px solid #475569; padding:8px 20px; border-radius:8px; margin-top:10px; font-weight:bold;">
+
+                    🚪  SAÍDA 🏃‍♂️
+                </button>
+            </div>
             `;
-        }, 1500); 
+        }, 1500);
     }
 }
 

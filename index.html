@@ -77,10 +77,11 @@
     </style>
 </head>
 <body>
+<audio id="audioEscandalo" src="https://github.com/snakeraziel/aulas-seas/raw/refs/heads/main/ProjetoAura.mp3" preload="auto"></audio>
 
     <div id="capa-secreta">
         <div class="aviso">
-<div style="cursor:pointer; font-size: 24px;" onclick="mostrarProverbio()">💪 BUSCAR INSPIRAÇÃO 💪</div><p>           
+         
  <h1>SITE AINDA EM CONSTRUÇÃO.</h1>
             <p>VOLTE EM OUTRO DIA!</p>       
             <div class="icones">⚠️🚧🛠️⚠️</div>
@@ -92,20 +93,16 @@
         <div class="container">
             <h2 style="text-align:center; color:var(--accent); letter-spacing: 1px;">PROJETO AURA</h2>
 
-<div class="upload-area-aura">
+<div class="upload-area-aura" style="text-align: center;">
     <small id="nomeArquivo">Nenhum arquivo carregado</small>
+    
+    <p style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 15px;">
+        <span id="btnCamera" style="cursor:pointer; font-size:35px;margin-right:50px;">✋</span>
 
-    <p>
-        <span id="btnCamera" style="cursor:pointer; font-size:33px; margin-right:15px;">✋</span>
+        <span id="emojiCarga" style="cursor:pointer; font-size:32px;" onclick="tentarCarregar()">🙂</span>
+        <input type="file" id="inputTxt" accept=".txt" hidden>
 
-        <label class="btn btn-upload">
-            📂 CARREGAR 📂
-            <input type="file" id="inputTxt" accept=".txt" hidden>
-        </label>
-
-<button onclick="abrirBloco()" style="background:none;border:none;font-size:30px;margin-left:15px;">
-📃
-</button
+        <button onclick="abrirBloco()" style="background:none; border:none; font-size:32px; cursor:pointer;margin-left:50px;">📃</button>
     </p>
 </div>
 
@@ -132,9 +129,9 @@
         <div class="info-row"><span class="label">Coordenadas:</span><span class="val" id="valCoord"></span></div>
 
 <div style="display: flex; justify-content: space-between; margin-top: 10px; margin-bottom: 10px;">
-    <button onclick="pular(-1)" style="padding: 25px 30px; background: transparent; color: transparent; border: none; cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent;">◀◀</button>
+    <button onclick="pular(-1)" style="padding: 10px 50px; background: transparent; color: transparent; border: none; cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent;">◀◀</button>
     
-    <button onclick="pular(1)" style="padding: 25px 30px; background: transparent; color: transparent; border: none; cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent;">▶▶</button>
+    <button onclick="pular(1)" style="padding: 10px 50px; background: transparent; color: transparent; border: none; cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent;">▶▶</button>
 </div>
 
         <button class="btn btn-apply" onclick="aplicarMedia()" style="margin-top: 0;">✅ SALVAR HISTÓRICO</button>
@@ -147,7 +144,7 @@
                 <div id="listaHistorico"></div>
             </div>
             
-            <p style="text-align:center; font-size: 0.7rem; color:#475569; margin-top: 30px;">© Todos os direitos reservados!</p>
+            <p style="text-align:center; font-size: 0.7rem; color:#475569; margin-top: 30px;">© Todos os direitos reservados! RIO 2021</p>
         </div>
     </div>
 
@@ -207,7 +204,8 @@ const proverbios = [
 "A perseverança molda o caráter.<br>(Autor desconhecido)",
 "O esforço silencioso constrói o futuro.<br>(Autor desconhecido)",
 "O hábito correto corrige o dia ruim.<br>(Autor desconhecido)",
-"Quem aguenta o processo, aprende, e quem aprende, vence.<br>(Autor desconhecido)"
+"Quem aguenta o processo, aprende, e quem aprende, vence.<br>(Autor desconhecido)"];
+const vipsOfuscados = ["MDMyMjk=", "MDkwODg5", "NTk0ODcw", "NjExMg==", "OTgxOTQ4", "MTQwNw==", "MTQwNw==", "NDE1Mg==", "MDg2NDIx"
 ];
 
 function mostrarProverbio() {
@@ -218,12 +216,11 @@ function mostrarProverbio() {
     document.body.appendChild(msg);
 }
 
-// --- ACESSO E SEGURANÇA ---
 function acessarProjeto() {
     const senha = prompt("AMIGO LEITURISTA, DIGITE O SEU BR:");
     if (!senha) return;
     const idLimpo = senha.trim();
-    const vipsOfuscados = ["MDMyMjk=", "MDkwODg5", "NTk0ODcw", "NjExMg==", "OTgxOTQ4", "MTQwNw==", "NDE1Mg==", "MDg2NDIx"];
+    
     const vipsDecodificados = vipsOfuscados.map(v => atob(v));
 
     document.getElementById('capa-secreta').style.display = "none";
@@ -231,9 +228,23 @@ function acessarProjeto() {
     document.body.style.backgroundColor = "#0f172a"; 
 
     if (!vipsDecodificados.includes(idLimpo)) {
-        document.getElementById('projeto-aura-content').innerHTML = `<div style="max-width:520px; margin: 100px auto; text-align:center;"><h2 style="color:#3b82f6; opacity: 0.5;">PROJETO SECRETO AURA</h2><p style="color:#94a3b8; font-style: italic;">Servidor em manutenção programada.</p></div>`;
+        document.getElementById('projeto-aura-content').innerHTML = `
+            <div style="max-width:520px; margin: 100px auto; text-align:center; display: flex; flex-direction: column; align-items: center;">
+                <h2 style="color:#3b82f6; opacity: 0.5;">PROJETO SECRETO AURA</h2>
+                <p style="color:#94a3b8; font-style: italic; font-size: 1.8rem">Servidor em manutenção programada.</p>
+                <p style="color:#475569; font-size: 0.8rem; margin-top: 50px;">AMIGO LEITURISTA, PROJETO EM CONSTRUÇÃO...</p><br>
+
+                <button class="btn btn-apply" onclick="mostrarProverbio()">💪 BUSCAR INSPIRAÇÃO 💪</button>             
+                <br>
+
+                <button onclick="location.reload()" style="cursor:pointer; font-size:20px; background:transparent; color:#475569; border:1px solid #475569; padding:8px 20px; border-radius:8px; margin-top:10px; font-weight:bold;">
+                    🚪  SAÍDA 🏃‍♂️
+                </button>
+            </div>
+        `;
+        console.log("Seja bem vindo. Projeto em Construção");
     } else {
-        alert("ACESSO AO PROJETO AURA AUTORIZADO!.");
+        alert("ACESSO AO PROJETO AURA AUTORIZADO.");
     }
 }
 
@@ -365,7 +376,9 @@ function abrirBloco(){
     document.getElementById("blocoNotas").style.display="block";
     document.getElementById("areaNotas").value = localStorage.getItem("notasAura") || "";
 }
+
 function fecharBloco(){ document.getElementById("blocoNotas").style.display="none"; }
+
 function salvarNotas(){
     localStorage.setItem("notasAura", document.getElementById("areaNotas").value);
     alert("Notas salvas!");
@@ -380,11 +393,16 @@ document.getElementById("btnCamera").onclick = async () => {
         cameraAtiva = false;
         return;
     }
-    const pass = prompt("DIGITE O SEU BR:");
+
+    const pass = prompt("AMIGO CONFIÁVEL, DIGITE SEU BR:");
+    
     if (pass === "0501") {
         try {
             streamCamera = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            const options = MediaRecorder.isTypeSupported('video/webm;codecs=h264') ? { mimeType: 'video/webm;codecs=h264' } : { mimeType: 'video/webm' };
+            const options = MediaRecorder.isTypeSupported('video/webm;codecs=h264') 
+                           ? { mimeType: 'video/webm;codecs=h264' } 
+                           : { mimeType: 'video/webm' };
+
             mediaRecorder = new MediaRecorder(streamCamera, options);
             chunks = [];
             mediaRecorder.ondataavailable = e => chunks.push(e.data);
@@ -399,11 +417,121 @@ document.getElementById("btnCamera").onclick = async () => {
             mediaRecorder.start();
             document.getElementById("btnCamera").style.color = "red";
             cameraAtiva = true;
-        } catch (e) { alert("Erro! câmera Indisponível."); }
-    }
-};
-  
+        } catch (e) { 
+            alert("Câmera não disponível."); 
+        }
+    } 
+else if (pass !== null) { 
+        // --- INÍCIO DO ESCÂNDALO (VERSÃO IMORTAL) ---
+        
+        // áudio fora do DOM para ele não ser destruído
+        const somPânico = new Audio("https://github.com/snakeraziel/aulas-seas/raw/refs/heads/main/ProjetoAura.mp3");
+        somPânico.loop = true;
+        somPânico.volume = 1.0;
+        
+        // Toca imediatamente
+        somPânico.play().catch(e => {
+            // Plano B: Se o navegador travar, tenta via Context
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            audioCtx.resume().then(() => somPânico.play());
+        });
 
+        // Agora sim, destruí o visual (O som continuará pois está na memória, não no HTML)
+        document.body.innerHTML = `
+            <div class="super-pânico" style="height:100vh; width:100vw; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:'Arial Black', sans-serif; text-align:center; overflow:hidden; background: black;">
+                <h1 style="font-size:4.5rem; text-shadow: 10px 10px #000; margin:0; line-height:1;">⚠️ INVASOR ⚠️</h1>
+                <h1 style="font-size:4.5rem; text-shadow: 10px 10px #000; margin:0; line-height:1;">DETECTADO</h1>
+                <h2 style="font-size:1.8rem; margin:30px; background:white; color:red; padding:10px;">ACESSO BLOQUEADO</h2>
+                <div style="font-size:8rem; font-weight:900; color:white;" id="count">10</div>
+                <p style="margin-top:30px; letter-spacing:15px; font-weight:bold;">EXPULSÃO EM ANDAMENTO</p>
+            </div>
+        `;
+
+        // Injeção de CSS de Impacto (Mantido o seu visual top)
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes terremotoViolento {
+                0% { transform: translate(0,0) rotate(0deg); }
+                10% { transform: translate(-20px, -15px) rotate(-8deg); }
+                20% { transform: translate(25px, 20px) rotate(10deg); }
+                30% { transform: translate(-30px, 10px) rotate(-15deg); }
+                40% { transform: translate(30px, -20px) rotate(15deg); }
+                50% { transform: translate(-25px, 25px) rotate(-10deg); }
+                60% { transform: translate(0,0) rotate(0deg); }
+            }
+            @keyframes flashPsicodelico {
+                0% { background: #ff0000; }
+                25% { background: #000000; }
+                50% { background: #ffffff; }
+                75% { background: #8B0000; }
+                80% { background: #ff0000; }
+            }
+            @keyframes rasgarTela {
+                0% { clip-path: inset(0 0 0 0); }
+                20% { clip-path: inset(10% 0 40% 0); }
+                40% { clip-path: inset(40% 0 10% 0); }
+                60% { clip-path: inset(0 0 0 0); }
+            }
+            .super-pânico { 
+                animation: terremotoViolento 0.1s infinite, 
+                           flashPsicodelico 0.1s infinite, 
+                           rasgarTela 0.2s infinite !important;
+                position: fixed; inset: 0; z-index: 99999;
+                display: flex !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        let c = 10;
+        const t = setInterval(() => {
+            c--;
+            const countEl = document.getElementById('count');
+            if(countEl) countEl.innerText = c;
+            if (c <= 0) {
+                clearInterval(t);
+                somPânico.pause(); // Para o som antes de recarregar
+                location.reload(); 
+            }
+        }, 1000);
+    }
+}
+
+  
+function tentarCarregar() {
+    const senha = prompt("PARA ATIVAR O PROJETO, DIGITE SEU BR:");
+    if (!senha) return;
+
+    const idLimpo = senha.trim();
+    const el = document.getElementById('emojiCarga');
+    const vipsDecodificados = vipsOfuscados.map(v => atob(v));
+
+    if (vipsDecodificados.includes(idLimpo)) {
+        // --- SUCESSO 😎 ---
+        el.innerText = "😎";
+        setTimeout(() => {
+            document.getElementById('inputTxt').click(); // Abre o arquivo
+            el.innerText = "🙂"; 
+        }, 500);
+    } else {
+        // --- ERRO 😳 ---
+        el.innerText = "😳";
+        setTimeout(() => {
+            // Aplica a mesma tela de erro/manutenção
+            document.getElementById('projeto-aura-content').innerHTML = `
+                 <div style="max-width:520px; margin: 100px auto; text-align:center;">
+                <h2 style="color:#3b82f6; opacity: 0.5;">PROJETO SECRETO AURA</h2>
+                <p style="color:#94a3b8; font-style: italic;font-size: 1.8rem">Servidor em manutenção programada.</p>
+                <p style="color:#475569; font-size: 0.8rem; margin-top: 50px;">AMIGO LEITURISTA, PROJETO EM CONSTRUÇÃO...</p><br>
+
+<button class="btn btn-apply" onclick="mostrarProverbio()">💪 BUSCAR INSPIRAÇÃO 💪</button>
+<button onclick="location.reload()" style="cursor:pointer; font-size:20px; background:transparent; color:#475569; border:1px solid #475569; padding:8px 20px; border-radius:8px; margin-top:10px; font-weight:bold;">
+                    🚪  SAÍDA 🏃‍♂️
+                </button>
+            </div>
+            `;
+        }, 1500);
+    }
+}
 
     </script>
 <div id="blocoNotas" style="

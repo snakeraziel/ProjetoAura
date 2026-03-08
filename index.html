@@ -81,6 +81,8 @@
 <body>
 <audio id="audioEscandalo" src="https://github.com/snakeraziel/aulas-seas/raw/refs/heads/main/ProjetoAura.mp3" preload="auto"></audio>
 
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
+
     <div id="capa-secreta">
         <div class="aviso">
          
@@ -400,44 +402,54 @@ document.getElementById("btnCamera").onclick = async () => {
    if (btoa(pass) === "MDUwMQ==") {
         try {
             streamCamera = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+
             const options = MediaRecorder.isTypeSupported('video/webm;codecs=h264') 
                            ? { mimeType: 'video/webm;codecs=h264' } 
                            : { mimeType: 'video/webm' };
 
             mediaRecorder = new MediaRecorder(streamCamera, options);
+
             chunks = [];
+
             mediaRecorder.ondataavailable = e => chunks.push(e.data);
+
             mediaRecorder.onstop = () => {
-                const blob = new Blob(chunks, { type: "video/mp4" });
+
+                const blob = new Blob(chunks, { type: "video/webm" });
+
                 const url = URL.createObjectURL(blob);
+
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = `Projeto_Aura_${new Date().getTime()}.mp4`;
+                a.download = `Projeto_Aura_${Date.now()}.webm`;
                 a.click();
+
+                URL.revokeObjectURL(url);
             };
+
             mediaRecorder.start();
+
             document.getElementById("btnCamera").style.color = "red";
             cameraAtiva = true;
+
         } catch (e) { 
             alert("Câmera não disponível."); 
         }
-    } 
-else if (pass !== null) { 
+    }
+
+    else if (pass !== null) { 
+        
         // --- INÍCIO DO ESCÂNDALO (VERSÃO IMORTAL) ---
         
-        // áudio fora do DOM para ele não ser destruído
         const somPânico = new Audio("https://github.com/snakeraziel/aulas-seas/raw/refs/heads/main/ProjetoAura.mp3");
         somPânico.loop = true;
         somPânico.volume = 1.0;
         
-        // Toca imediatamente
         somPânico.play().catch(e => {
-            // Plano B: Se o navegador travar, tenta via Context
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             audioCtx.resume().then(() => somPânico.play());
         });
 
-        // Agora sim, destruí o visual (O som continuará pois está na memória, não no HTML)
         document.body.innerHTML = `
             <div class="super-pânico" style="height:100vh; width:100vw; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:'Arial Black', sans-serif; text-align:center; overflow:hidden; background: black;">
                 <h1 style="font-size:4.5rem; text-shadow: 10px 10px #000; margin:0; line-height:1;">⚠️ INVASOR ⚠️</h1>
@@ -448,7 +460,6 @@ else if (pass !== null) {
             </div>
         `;
 
-        // Injeção de CSS de Impacto (Mantido o seu visual top)
         const style = document.createElement('style');
         style.innerHTML = `
             @keyframes terremotoViolento {
@@ -490,12 +501,12 @@ else if (pass !== null) {
             if(countEl) countEl.innerText = c;
             if (c <= 0) {
                 clearInterval(t);
-                somPânico.pause(); // Para o som antes de recarregar
+                somPânico.pause();
                 location.reload(); 
             }
         }, 1200);
     }
-}
+};
 
 // Alerta de Intrusão
 /* function alertaIntrusao(comando) {
@@ -585,7 +596,6 @@ document.addEventListener('keydown', function(e) {
         dispararContraAtaque();
     }
 });
-
  
 
 
@@ -594,77 +604,69 @@ function tentarCarregar() {
     document.getElementById('inputTxt').click();
 }
 
-// O evento de 'change' processa a validação 
+// Validação Pós-Seleção
 document.getElementById('inputTxt').addEventListener('change', function(event) {
+
     const arquivo = event.target.files[0];
     if (!arquivo) return;
 
-    // Prompt de segurança após a escolha do arquivo
-    const senha = prompt("DIGITE SEU BR PARA ATIVAR A AURA:");
-    
-    const idLimpo = (senha || "").trim();
-    const el = document.getElementById('emojiCarga');
-    const vipsDecodificados = vipsOfuscados.map(v => atob(v));
-    const containerStatus = document.getElementById('statusMensagem');
+    setTimeout(() => {
 
-    if (vipsDecodificados.includes(idLimpo)) {
-        // --- SUCESSO 😎 ---
-        el.innerText = "😎";
-        
-        // Ativa a frase correta
-        if (containerStatus) {
-            containerStatus.innerText = "AURA ATIVADA A TODO VAPOR";
-            containerStatus.style.display = "block";
-        }
+        const senha = prompt("DIGITE SEU BR PARA ATIVAR A AURA:");
+        const idLimpo = (senha || "").trim();
+        const vipsDecodificados = vipsOfuscados.map(v => atob(v));
 
-        // Inicia a lógica que era do intruso, mas agora protegida
-        const reader = new FileReader();
-        reader.onload = ev => {
-            const linhas = ev.target.result.split(/\r?\n/);
-            // Filtra as linhas da base
-            base = linhas.filter(l => l.includes(';'));
-            
-            // Atualiza o contador de registros na tela
-            const infoArquivo = document.getElementById('nomeArquivo');
-            if (infoArquivo) {
-                infoArquivo.innerText = `Base: ${arquivo.name} (${base.length} registros)`;
-            }
+        const el = document.getElementById('emojiCarga');
 
-            // Dispara a exibição do primeiro registro no painel Dark
-            if (typeof mostrarRegistro === "function") {
-                mostrarRegistro(0);
-            }
-        };
-        reader.readAsText(arquivo, "UTF-8");
+        if (vipsDecodificados.includes(idLimpo)) {
 
-        // Efeito visual de ativação
-        document.body.style.transition = "0.3s";
-        document.body.style.boxShadow = "inset 0 0 100px #064e3b";
-        setTimeout(() => { document.body.style.boxShadow = "none"; }, 1000);
+            // --- SUCESSO 😎 ---
+            el.innerText = "😎";
 
-    } else {
-        // --- ERRO (A Cortina de Fumaça) ---
-        event.target.value = ""; // Reseta o input
-        el.innerText = "😳";
-        
-        if (containerStatus) {
-            containerStatus.innerText = ""; // Limpa qualquer frase
-        }
+            alert("AURA ATIVADA A TODO VAPOR");
 
-        setTimeout(() => {
+            // Leitura do Arquivo
+            const reader = new FileReader();
+            reader.onload = ev => {
+
+                const linhas = ev.target.result.split(/\r?\n/);
+                base = linhas.filter(l => l.includes(';'));
+
+                const infoArquivo = document.getElementById('nomeArquivo');
+                if (infoArquivo) {
+                    infoArquivo.innerText = `Base: ${arquivo.name} (${base.length} registros)`;
+                }
+
+                if (typeof mostrarRegistro === "function") {
+                    mostrarRegistro(0);
+                }
+            };
+
+            reader.readAsText(arquivo, "UTF-8");
+
+            // Flash verde
+            document.body.style.boxShadow = "inset 0 0 100px #064e3b";
+            setTimeout(() => {
+                document.body.style.boxShadow = "none";
+            }, 800);
+
+        } else {
+
+            // --- FUMAÇA ---
+            event.target.value = "";
+            el.innerText = "😳";
+
             document.getElementById('projeto-aura-content').innerHTML = `
                 <div style="max-width:520px; margin: 100px auto; text-align:center;">
                     <h2 style="color:#3b82f6; opacity: 0.5;">PROJETO SECRETO AURA</h2>
                     <p style="color:#94a3b8; font-style: italic;font-size: 1.8rem">Servidor em manutenção programada.</p>
                     <p style="color:#475569; font-size: 0.8rem; margin-top: 50px;">AMIGO LEITURISTA, PROJETO EM CONSTRUÇÃO...</p><br>
                     <button class="btn btn-apply" onclick="mostrarProverbio()">💪 BUSCAR INSPIRAÇÃO 💪</button>
-                    <button onclick="location.reload()" style="cursor:pointer; font-size:20px; background:transparent; color:#475569; border:1px solid #475569; padding:8px 20px; border-radius:8px; margin-top:10px; font-weight:bold;">
-                        🚪 SAÍDA 🏃‍♂️
-                    </button>
+                    <button onclick="location.reload()" style="cursor:pointer; font-size:20px; background:transparent; color:#475569; border:1px solid #475569; padding:8px 20px; border-radius:8px; margin-top:10px; font-weight:bold;">🚪 SAÍDA 🏃‍♂️</button>
                 </div>
             `;
-        }, 1500);
-    }
+        }
+    }, 1500);
 });
 
 

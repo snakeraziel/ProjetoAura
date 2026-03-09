@@ -153,7 +153,8 @@
         </div>
     </div>
 
-<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/umd/ffmpeg.min.js"></script>
+<script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 
     <script>
 
@@ -715,58 +716,65 @@ document.addEventListener('copy', (e) => {
 }); */
 
 
-const { createFFmpeg, fetchFile } = FFmpeg;
+// A nova forma de importar
+const { FFmpeg } = FFmpegWasm;
+const { fetchFile, toBlobURL } = FFmpegUtil;
 
-const ffmpeg = createFFmpeg({
-    log: true
-});
+let ffmpeg = null;
 
 document.getElementById("btnConverter").onclick = async () => {
-
     const fileInput = document.getElementById("inputWebm");
-
     if (!fileInput.files.length) {
         alert("Selecione um arquivo WEBM primeiro.");
         return;
     }
 
     const file = fileInput.files[0];
+    const btn = document.getElementById("btnConverter");
+    btn.innerText = "Convertendo... Aguarde.";
+    btn.disabled = true;
 
     try {
-
-        if (!ffmpeg.isLoaded()) {
-            await ffmpeg.load();
+        if (ffmpeg === null) {
+            ffmpeg = new FFmpeg();
+            // Carrega os arquivos core (worker) da versão nova
+            const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+            await ffmpeg.load({
+                coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+                wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+            });
         }
 
-        ffmpeg.FS('writeFile', 'entrada.webm', await fetchFile(file));
+        // Escrever o arquivo (Nova sintaxe: writeFile)
+        await ffmpeg.writeFile('entrada.webm', await fetchFile(file));
 
-        await ffmpeg.run(
+        // Executar a conversão (Nova sintaxe: exec)
+        await ffmpeg.exec([
             '-i', 'entrada.webm',
             '-c:v', 'libx264',
+            '-preset', 'ultrafast', // Crucial para não travar o navegador
             '-c:a', 'aac',
-            '-movflags', 'faststart',
             'saida.mp4'
-        );
+        ]);
 
-        const data = ffmpeg.FS('readFile', 'saida.mp4');
-
+        // Ler o arquivo (Nova sintaxe: readFile)
+        const data = await ffmpeg.readFile('saida.mp4');
         const mp4Blob = new Blob([data.buffer], { type: 'video/mp4' });
 
         const url = URL.createObjectURL(mp4Blob);
-
         const a = document.createElement("a");
         a.href = url;
         a.download = file.name.replace(".webm", ".mp4");
         a.click();
 
-        URL.revokeObjectURL(url);
-
         alert("Conversão concluída!");
 
     } catch (err) {
-
         console.error(err);
-        alert("Erro na conversão.");
+        alert("Erro na conversão: " + err.message);
+    } finally {
+        btn.innerText = "Converter para MP4";
+        btn.disabled = false;
     }
 };
 

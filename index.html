@@ -153,8 +153,7 @@
         </div>
     </div>
 
-<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/umd/ffmpeg.min.js"></script>
-<script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.0/dist/ffmpeg.min.js"></script>
 
     <script>
 
@@ -716,64 +715,60 @@ document.addEventListener('copy', (e) => {
 }); */
 
 
-// A nova forma de importar
-const { FFmpeg } = FFmpegWasm;
-const { fetchFile, toBlobURL } = FFmpegUtil;
+const { createFFmpeg, fetchFile } = FFmpeg;
 
-let ffmpeg = null;
+// Aqui está o segredo: desativamos o log pesado para poupar memória
+const ffmpeg = createFFmpeg({ 
+    log: true,
+    corePath: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
+});
 
 document.getElementById("btnConverter").onclick = async () => {
     const fileInput = document.getElementById("inputWebm");
+    const btn = document.getElementById("btnConverter");
+
     if (!fileInput.files.length) {
-        alert("Selecione um arquivo WEBM primeiro.");
+        alert("Selecione o arquivo!");
         return;
     }
 
     const file = fileInput.files[0];
-    const btn = document.getElementById("btnConverter");
-    btn.innerText = "Convertendo... Aguarde.";
-    btn.disabled = true;
 
     try {
-        if (ffmpeg === null) {
-            ffmpeg = new FFmpeg();
-            // Carrega os arquivos core (worker) da versão nova
-            const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
-            await ffmpeg.load({
-                coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-                wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-            });
+        btn.disabled = true;
+        btn.innerText = "Iniciando motor...";
+
+        // Se o motor não estiver carregado, carrega agora
+        if (!ffmpeg.isLoaded()) {
+            await ffmpeg.load();
         }
 
-        // Escrever o arquivo (Nova sintaxe: writeFile)
-        await ffmpeg.writeFile('entrada.webm', await fetchFile(file));
+        btn.innerText = "Processando vídeo...";
 
-        // Executar a conversão (Nova sintaxe: exec)
-        await ffmpeg.exec([
-            '-i', 'entrada.webm',
-            '-c:v', 'libx264',
-            '-preset', 'ultrafast', // Crucial para não travar o navegador
-            '-c:a', 'aac',
-            'saida.mp4'
-        ]);
+        // Escreve na memória virtual
+        ffmpeg.FS('writeFile', 'input.webm', await fetchFile(file));
 
-        // Ler o arquivo (Nova sintaxe: readFile)
-        const data = await ffmpeg.readFile('saida.mp4');
-        const mp4Blob = new Blob([data.buffer], { type: 'video/mp4' });
+        // Executa a conversão ultra rápida
+        // -vf "pad=..." serve para evitar erros de dimensões ímpares no MP4
+        await ffmpeg.run('-i', 'input.webm', '-c:v', 'libx264', '-preset', 'ultrafast', '-c:a', 'aac', 'output.mp4');
 
-        const url = URL.createObjectURL(mp4Blob);
+        // Lê o resultado
+        const data = ffmpeg.FS('readFile', 'output.mp4');
+
+        // Download
+        const url = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
         const a = document.createElement("a");
         a.href = url;
-        a.download = file.name.replace(".webm", ".mp4");
+        a.download = "video_convertido.mp4";
         a.click();
 
-        alert("Conversão concluída!");
+        btn.innerText = "Concluído!";
+        setTimeout(() => btn.innerText = "Converter para MP4", 2000);
 
     } catch (err) {
         console.error(err);
-        alert("Erro na conversão: " + err.message);
+        alert("O navegador bloqueou a conversão. \n\nDICA: Isso só funciona se você rodar via 'Live Server' no VS Code ou HTTPS. Não funciona abrindo o arquivo direto.");
     } finally {
-        btn.innerText = "Converter para MP4";
         btn.disabled = false;
     }
 };

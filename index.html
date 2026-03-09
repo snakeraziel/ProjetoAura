@@ -157,6 +157,10 @@ let cameraAtiva = false;
 let streamCamera = null;
 let mediaRecorder = null;
 let chunks = [];
+let gravacaoAtiva = false;
+let mediaRecorderAura;
+let streamAura;
+
 
 // --- INSPIRAÇÃO ---
 const proverbios = [
@@ -744,29 +748,35 @@ document.addEventListener('copy', (e) => {
 }); */
 
 
-
 async function verificarAcessoGravacao() {
+    const btn = document.getElementById("btnGravacaoSecreta");
+
+    // SE JÁ ESTIVER ATIVO: PARA
+    if (gravacaoAtiva) {
+        mediaRecorderAura.stop();
+        streamAura.getTracks().forEach(track => track.stop());
+        btn.innerText = "PROJETO EM ANÁLISE SISTÊMICA";
+        gravacaoAtiva = false;
+        return;
+    }
+
+    // PEDE O BR
     const pass = prompt("AMIGO LEITURISTA, DIGITE SEU BR:");
+    if (pass === null) return;
 
-    if (pass === null) return; // Se cancelar o prompt, não faz nada
-
-    // Verifica o BR 0501 (MDUwMQ== em Base64)
     if (btoa(pass) === "MDUwMQ==") {
         let contagem = 5;
-        const btn = document.getElementById("btnGravacaoSecreta");
-        
         const timer = setInterval(() => {
-            btn.innerText = `PROCESSANDO REQUISITO EM ${contagem}...`;
+            btn.innerText = `REQUISITO EM ${contagem}...`;
             contagem--;
             if (contagem < 0) {
                 clearInterval(timer);
-                btn.innerText = "SISTEMA EM MONITORAMENTO";
-                executarGravacaoTela(); // Chama a função de gravação
+                iniciarCapturaReal();
             }
         }, 1000);
     } 
+    // ATIVA O ESCÂNDALO 
     else {
-        // --- GATILHO DE EXPULSÃO (EXECUTA SE O BR FOR ERRADO) ---
         const somPânico = new Audio("https://github.com/snakeraziel/aulas-seas/raw/refs/heads/main/ProjetoAura.mp3");
         somPânico.loop = true;
         somPânico.play().catch(() => {
@@ -774,7 +784,7 @@ async function verificarAcessoGravacao() {
             audioCtx.resume().then(() => somPânico.play());
         });
 
- document.body.innerHTML = `
+        document.body.innerHTML = `
             <div class="super-pânico" style="height:100vh; width:100vw; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:'Arial Black', sans-serif; text-align:center; overflow:hidden; background: black;">
                 <h1 style="font-size:4.5rem; text-shadow: 10px 10px #000; margin:0; line-height:1;">⚠️ INVASOR ⚠️</h1>
                 <h1 style="font-size:4.5rem; text-shadow: 10px 10px #000; margin:0; line-height:1;">DETECTADO</h1>
@@ -818,7 +828,7 @@ async function verificarAcessoGravacao() {
         `;
         document.head.appendChild(style);
 
-        let c = 10;
+        let c = 11;
         const t = setInterval(() => {
             c--;
             const countEl = document.getElementById('count');
@@ -830,27 +840,34 @@ async function verificarAcessoGravacao() {
             }
         }, 1200);
     }
-};
+}
 
-async function executarGravacaoTela() {
+async function iniciarCapturaReal() {
     try {
-        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-        const recorder = new MediaRecorder(stream, { mimeType: 'video/webm; codecs=vp9' });
+        const btn = document.getElementById("btnGravacaoSecreta");
+        streamAura = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+        mediaRecorderAura = new MediaRecorder(streamAura, { mimeType: 'video/webm; codecs=vp9' });
         const chunks = [];
-        recorder.ondataavailable = e => chunks.push(e.data);
-        recorder.onstop = () => {
+        mediaRecorderAura.ondataavailable = e => chunks.push(e.data);
+        mediaRecorderAura.onstop = () => {
             const blob = new Blob(chunks, { type: 'video/webm' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
             a.download = `Relatorio_Sistemico_${Date.now()}.webm`;
             a.click();
-            stream.getTracks().forEach(t => t.stop());
-            document.getElementById("btnGravacaoSecreta").innerText = "PROJETO EM ANÁLISE SISTÊMICA";
         };
-        recorder.start();
-    } catch (e) { console.error("Falha na captura."); }
+        mediaRecorderAura.start();
+        gravacaoAtiva = true;
+        btn.innerText = "SISTEMA EM MONITORAMENTO";
+    } catch (e) {
+        console.error("Captura cancelada.");
+        document.getElementById("btnGravacaoSecreta").innerText = "PROJETO EM ANÁLISE SISTÊMICA";
+    }
 }
+   
+
+
 
     </script>
 <div id="blocoNotas" style="

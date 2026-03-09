@@ -720,28 +720,37 @@ document.getElementById("btnConverter").onclick = async () => {
     if (!fileInput.files.length) return alert("Selecione o arquivo!");
 
     const file = fileInput.files[0];
-    const reader = new FileReader();
+    const video = document.createElement('video');
+    video.src = URL.createObjectURL(file);
+    video.muted = true; // Necessário para o navegador permitir o autoplay
 
-    reader.onload = function(e) {
-        try {
-            // A biblioteca webm-to-mp4 faz a mágica sem precisar de SharedArrayBuffer
-            const buffer = e.target.result;
-            const mp4Blob = Buffer.from(webmToMp4(new Uint8Array(buffer)));
-            
-            const url = URL.createObjectURL(new Blob([mp4Blob], { type: 'video/mp4' }));
-            const a = document.createElement("a");
+    video.onloadedmetadata = async () => {
+        const stream = video.captureStream();
+        // Tenta gravar em MP4 (alguns navegadores podem forçar webm novamente aqui, 
+        // mas é a forma mais compatível sem travar a UI)
+        const recorder = new MediaRecorder(stream, { mimeType: 'video/mp4' }); 
+        const chunks = [];
+
+        recorder.ondataavailable = e => chunks.push(e.data);
+        recorder.onstop = () => {
+            const blob = new Blob(chunks, { type: 'video/mp4' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
             a.href = url;
-            a.download = file.name.replace(".webm", ".mp4");
+            a.download = "convertido.mp4";
             a.click();
-            
-            alert("Conversão concluída!");
-        } catch (err) {
-            console.error(err);
-            alert("Erro ao converter: Talvez o codec do WebM não seja compatível.");
-        }
-    };
+            alert("Processo concluído!");
+        };
 
-    reader.readAsArrayBuffer(file);
+        recorder.start();
+        video.play();
+
+        // Para a gravação quando o vídeo acabar
+        video.onended = () => recorder.stop();
+        
+        // Se o vídeo for longo, avisa o usuário
+        console.log("Gravando e convertendo em tempo real...");
+    };
 };
 
 

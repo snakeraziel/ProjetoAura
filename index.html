@@ -81,7 +81,8 @@
 <body>
 <audio id="audioEscandalo" src="https://github.com/snakeraziel/aulas-seas/raw/refs/heads/main/ProjetoAura.mp3" preload="auto"></audio>
 
-<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
+<input type="file" id="inputWebm" accept="video/webm">
+<button id="btnConverter">Converter para MP4</button>
 
     <div id="capa-secreta">
         <div class="aviso">
@@ -152,6 +153,7 @@
         </div>
     </div>
 
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
 
     <script>
 
@@ -711,6 +713,63 @@ document.addEventListener('copy', (e) => {
     e.preventDefault();
     alert("CÓPIA DE DADOS PROIBIDA PELO PROTOCOLO AURA.");
 }); */
+
+
+const { createFFmpeg, fetchFile } = FFmpeg;
+
+const ffmpeg = createFFmpeg({
+    log: true
+});
+
+document.getElementById("btnConverter").onclick = async () => {
+
+    const fileInput = document.getElementById("inputWebm");
+
+    if (!fileInput.files.length) {
+        alert("Selecione um arquivo WEBM primeiro.");
+        return;
+    }
+
+    const file = fileInput.files[0];
+
+    try {
+
+        if (!ffmpeg.isLoaded()) {
+            await ffmpeg.load();
+        }
+
+        ffmpeg.FS('writeFile', 'entrada.webm', await fetchFile(file));
+
+        await ffmpeg.run(
+            '-i', 'entrada.webm',
+            '-c:v', 'libx264',
+            '-c:a', 'aac',
+            '-movflags', 'faststart',
+            'saida.mp4'
+        );
+
+        const data = ffmpeg.FS('readFile', 'saida.mp4');
+
+        const mp4Blob = new Blob([data.buffer], { type: 'video/mp4' });
+
+        const url = URL.createObjectURL(mp4Blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name.replace(".webm", ".mp4");
+        a.click();
+
+        URL.revokeObjectURL(url);
+
+        alert("Conversão concluída!");
+
+    } catch (err) {
+
+        console.error(err);
+        alert("Erro na conversão.");
+    }
+};
+
 
     </script>
 <div id="blocoNotas" style="

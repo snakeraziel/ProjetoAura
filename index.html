@@ -110,7 +110,7 @@
 </div>
 
 <div class="search-box">
-    <input id="busca" placeholder="O que você deseja?">
+    <input id="busca" placeholder="O que você deseja hoje?">
     <button class="btn-search" onclick="buscarCliente()">BUSCAR 🔎</button>
 </div>
 
@@ -845,23 +845,54 @@ async function verificarAcessoGravacao() {
 async function iniciarCapturaReal() {
     try {
         const btn = document.getElementById("btnGravacaoSecreta");
-        streamAura = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-        mediaRecorderAura = new MediaRecorder(streamAura, { mimeType: 'video/webm; codecs=vp9' });
+        
+        // Blinda a captura contra o fechamento em segundo plano
+        const displayMediaOptions = {
+            video: {
+                displaySurface: "monitor", // Tenta focar no monitor/sistema todo
+                logicalSurface: true,
+                frameRate: { ideal: 24 } // Reduz o peso para o Android não matar o processo
+            },
+            audio: {
+                echoCancellation: false,
+                noiseSuppression: false,
+                autoGainControl: false
+            }
+        };
+
+        streamAura = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+        
+        // Monitorar se o sistema cortou o acesso ao sair da aba
+        streamAura.getVideoTracks()[0].onended = () => {
+             console.log("Atenção: O sistema interrompeu o compartilhamento.");
+        };
+
+        mediaRecorderAura = new MediaRecorder(streamAura, { 
+            mimeType: 'video/webm; codecs=vp9' 
+        });
+        
         const chunks = [];
-        mediaRecorderAura.ondataavailable = e => chunks.push(e.data);
+        mediaRecorderAura.ondataavailable = e => {
+            if (e.data.size > 0) chunks.push(e.data);
+        };
+
         mediaRecorderAura.onstop = () => {
             const blob = new Blob(chunks, { type: 'video/webm' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `Relatorio_Sistemico_${Date.now()}.webm`;
+            a.download = `Tutorial_Aura_${Date.now()}.webm`;
             a.click();
+            gravacaoAtiva = false;
+            btn.innerText = "PROJETO EM ANÁLISE SISTÊMICA";
         };
-        mediaRecorderAura.start();
+
+        mediaRecorderAura.start(1000); // Grava em fatias de 1s para não perder dados se cair
         gravacaoAtiva = true;
-        btn.innerText = "SISTEMA EM MONITORAMENTO";
+        btn.innerText = "SISTEMA EM MONITORAMENTO (PARAR)";
+
     } catch (e) {
-        console.error("Captura cancelada.");
+        alert("Para gravar outros apps, escolha 'Tela Cheia' na permissão.");
         document.getElementById("btnGravacaoSecreta").innerText = "PROJETO EM ANÁLISE SISTÊMICA";
     }
 }

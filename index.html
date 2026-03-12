@@ -115,25 +115,31 @@
 </div>
 
 <div id="painelCliente">
-        <div id="nomeCliente" style="color:var(--accent); font-weight:800; margin-bottom:10px; font-size: 1.1rem;"></div>
-        <div class="info-row"><span class="label">Nº do Cliente:</span><span class="val" id="valNC"></span></div>
-        <div class="info-row"><span class="label">Nº do Medidor:</span><span class="val" id="valMedidor"></span></div>
-        <div class="info-row"><span class="label">Última Leitura:</span><span class="val" id="valULeitura"></span></div>
-        <div class="info-row"><span class="label">Consumo Anterior:</span><span class="val" id="valMediaAnt"></span></div>
-        <div class="info-row"><span class="label">Sugestão de Leitura (Simulação):</span><span class="val" id="valNova" style="color: #22c55e;"></span></div>
-        <div class="info-row"><span class="label">Entrega:</span><span class="val" id="valProcEntrega"></span></div>
-        <div class="info-row"><span class="label">Código Principal:</span><span class="val" id="valCodPrincipal"></span></div>
-        <div class="info-row"><span class="label">Código Secundário:</span><span class="val" id="valCodSecundario"></span></div>
-        <div class="info-row"><span class="label">Coordenadas:</span><span class="val" id="valCoord"></span></div>
-
-<div style="display: flex; justify-content: space-between; margin-top: 10px; margin-bottom: 10px;">
-    <button onclick="pular(-1)" style="padding: 15px 50px; background: transparent; color: transparent; border: none; cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent;">◀◀</button>
+    <div id="nomeCliente" style="color:var(--accent); font-weight:800; margin-bottom:10px; font-size: 1.1rem;"></div>
+    <div class="info-row"><span class="label">Nº do Cliente:</span><span class="val" id="valNC"></span></div>
+    <div class="info-row"><span class="label">Nº do Medidor:</span><span class="val" id="valMedidor"></span></div>
+    <div class="info-row"><span class="label">Última Leitura:</span><span class="val" id="valULeitura"></span></div>
+    <div class="info-row"><span class="label">Consumo Anterior:</span><span class="val" id="valMediaAnt"></span></div>
+    <div class="info-row"><span class="label">Simulação de Leitura (Sugestão: Diminua uns kwh):</span><span class="val" id="valNova" style="color: #22c55e;"></span></div>
+    <div class="info-row"><span class="label">Entrega:</span><span class="val" id="valProcEntrega"></span></div>
     
-    <button onclick="pular(1)" style="padding: 15px 50px; background: transparent; color: transparent; border: none; cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent;">▶▶</button>
-</div>
+    <div class="info-row campo-gd"><span class="label">Última Leitura GD:</span><span class="val" id="valULeituraGD"></span></div>
+    <div class="info-row campo-gd"><span class="label">Consumo Anterior GD:</span><span class="val" id="valMediaAntGD"></span></div>
+    <div class="info-row campo-gd"><span class="label">Simulação de Leitura (Sugestão: Diminua uns kwh):</span><span class="val" id="valNovaGD" style="color: #22c55e;"></span></div>
+    
+    <div class="info-row"><span class="label">Código Principal:</span><span class="val" id="valCodPrincipal"></span></div>
+    <div class="info-row"><span class="label">Código Secundário:</span><span class="val" id="valCodSecundario"></span></div>
+    <div class="info-row"><span class="label">Coordenadas:</span><span class="val" id="valCoord"></span></div>
 
-        <button class="btn btn-apply" onclick="aplicarMedia()" style="margin-top: 0;">✅ SALVAR HISTÓRICO</button>
+    <div style="display: flex; justify-content: space-between; margin-top: 10px; margin-bottom: 10px;">
+        <button onclick="pular(-1)" style="padding: 15px 50px; background: transparent; color: transparent; border: none; cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent;">◀◀</button>
+        <button onclick="pular(1)" style="padding: 15px 50px; background: transparent; color: transparent; border: none; cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent;">▶▶</button>
     </div>
+
+    <button class="btn btn-apply" onclick="aplicarMedia()" style="margin-top: 0;">✅ SALVAR HISTÓRICO</button>
+    
+<!--    <button id="btnMediaGD" class="btn btn-apply campo-gd" onclick="aplicarMediaGD()" style="margin-top: 10px; background: #16a34a;">✅ SALVAR HISTÓRICO GD</button> -->
+</div>
 
 
 
@@ -295,6 +301,7 @@ function pular(direcao) {
 }
 
 function preencherPainel(p) {
+    // Extração de Dados dos Índices do Array
     const nc = p[0]?.trim();                  
     const leitura = p[1]?.trim() || "0";     
     const codPrincipal = p[5]?.trim() || "0"; 
@@ -303,10 +310,17 @@ function preencherPainel(p) {
     const medidor = p[29]?.trim() || "";      
     const media = p[33]?.trim() || "0";        
     const nova = (parseInt(leitura) || 0) + (parseInt(media) || 0);
+
+    // Campos Geração Distribuída (GD)
+    const leituraGD = p[44]?.trim() || "0"; 
+    const mediaGD = p[45]?.trim() || "0";
+    const novaGD = (parseInt(leituraGD) || 0) + (parseInt(mediaGD) || 0);
+
     const codSecundario = p[48]?.trim() || "0"; 
     const lat = p[49]?.trim() || "";          
     const lng = p[50]?.trim() || "";          
 
+    // Dicionário de Descrições de Entrega
     const descricoesEntrega = {
         "00": "FATURA NÃO IMPRESSA",
         "01": "EM MÃOS",
@@ -325,10 +339,10 @@ function preencherPainel(p) {
     };
 
     const formaFinal = (!codigoEntrega || codigoEntrega === "0" || codigoEntrega === "00") 
-        ? "EMAIL, CORTADO, DESATIVADO" 
+        ? "EMAIL, CORTADO OU DESATIVADO" 
         : (descricoesEntrega[codigoEntrega] || "CÓDIGO: " + codigoEntrega);
 
-    document.getElementById("nomeCliente").innerText = nome;
+    // Preenchimento do DOM (Campos Comuns)
     document.getElementById("valNC").innerText = nc;
     document.getElementById("valMedidor").innerText = medidor;
     document.getElementById("valULeitura").innerText = leitura;
@@ -338,19 +352,49 @@ function preencherPainel(p) {
     document.getElementById("valCodPrincipal").innerText = codPrincipal;
     document.getElementById("valCodSecundario").innerText = codSecundario;
 
+    // Preenchimento do DOM (Campos GD)
+    document.getElementById("valULeituraGD").innerText = leituraGD;
+    document.getElementById("valMediaAntGD").innerText = mediaGD;
+    document.getElementById("valNovaGD").innerText = novaGD;
+
+    // Lógica de Exibição Dinâmica (Filtro GD)
+    // Se houver valor GD 
+    const statusEspecial = p[58]?.trim() === "Sim";
+    const ehGD = (parseInt(leituraGD) > 0 || parseInt(mediaGD) > 0 || statusEspecial);
+    
+    // Seleciona as linhas GD no HTML
+    const linhasGD = document.querySelectorAll('.campo-gd');
+    const btnGD = document.getElementById("btnMediaGD"); // Caso tenha um botão específico
+
+    if (ehGD) {
+        linhasGD.forEach(el => el.style.display = "flex");
+        if(btnGD) btnGD.style.display = "inline-block";
+        document.getElementById("nomeCliente").innerHTML = `${nome} <span style="font-size:0.7rem; background:#22c55e; color:black; padding:2px 6px; border-radius:4px; margin-left:10px; vertical-align:middle;">GD</span>`;
+    } else {
+        linhasGD.forEach(el => el.style.display = "none");
+        if(btnGD) btnGD.style.display = "none";
+        document.getElementById("nomeCliente").innerText = nome;
+    }
+
+    // Configuração das Coordenadas
     const elCoord = document.getElementById("valCoord");
     if (lat && lng) {
         elCoord.innerText = `${lat}, ${lng}`;
         elCoord.style.color = "#3b82f6";
         elCoord.style.textDecoration = "underline";
+        elCoord.style.cursor = "pointer";
         elCoord.onclick = () => {
+            // Ajuste na URL para garantir o redirecionamento correto
             window.open(`https://www.google.com/maps/search/?api=1&query=${lat.replace(',','.')},${lng.replace(',','.')}`, '_blank');
         };
     } else {
         elCoord.innerText = "Não disponível";
+        elCoord.style.textDecoration = "none";
+        elCoord.style.color = "inherit";
         elCoord.onclick = null;
     }
 
+    // Finalização
     document.getElementById("painelCliente").style.display = "block";
     document.getElementById("painelCliente").dataset.nc = nc;
     renderHistoricoCliente(nc);
@@ -370,6 +414,34 @@ function aplicarMedia() {
     localStorage.setItem('historicoClientes', JSON.stringify(historico));
     renderHistoricoCliente(nc);
     alert("Histórico salvo!");
+}
+
+function aplicarMediaGD() {
+    const nc = document.getElementById('painelCliente').dataset.nc;
+    if (!nc) return;
+
+    // Pega os valores especificamente dos campos GD
+    const ultimaGD = parseInt(document.getElementById('valULeituraGD').innerText) || 0;
+    const mediaGD = parseInt(document.getElementById('valMediaAntGD').innerText) || 0;
+    const novaGD = ultimaGD + mediaGD;
+
+    let historico = JSON.parse(localStorage.getItem('historicoClientes')) || {};
+    if (!historico[nc]) historico[nc] = [];
+
+    // Salva no histórico identificando que é um registro de GD
+    historico[nc].unshift({ 
+        data: new Date().toLocaleString("pt-BR"), 
+        mediaAplicada: mediaGD, 
+        ultima: ultimaGD, 
+        nova: novaGD,
+        tipo: "GERAÇÃO GD" 
+    });
+
+    if (historico[nc].length > 5) historico[nc].pop(); // Aumentei para 5 para caber os dois tipos no histórico
+    localStorage.setItem('historicoClientes', JSON.stringify(historico));
+    
+    renderHistoricoCliente(nc);
+    alert("Média GD aplicada!");
 }
 
 function renderHistoricoCliente(nc) {

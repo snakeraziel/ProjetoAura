@@ -631,14 +631,14 @@ document.addEventListener('contextmenu', (e) => {
     console.warn("Clique direito desativado pelo Administrador.");
 }); */
 
-// 1. Dispara o Caos
+// Dispara o Caos
 function dispararContraAtaque() {
     const somPânico = new Audio("https://github.com/snakeraziel/aulas-seas/raw/refs/heads/main/ProjetoAura.mp3");
     somPânico.loop = true;
     somPânico.volume = 1.0;
     somPânico.play().catch(() => {}); // Toca o terror
 
-    // 1.2 Destruí o visual e criei a tela de invasor
+    // Destruí o visual e criei a tela de invasor
     document.body.innerHTML = `
         <div class="super-pânico" style="height:100vh; width:100vw; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:'Arial Black', sans-serif; text-align:center; overflow:hidden; background: black; position: fixed; inset: 0; z-index: 99999;">
             <h1 style="font-size:4.5rem; text-shadow: 10px 10px #000; margin:0; line-height:1;">⚠️ INVASOR ⚠️</h1>
@@ -649,7 +649,7 @@ function dispararContraAtaque() {
         </div>
     `;
 
-    // 1.3 Injetamos o CSS do Terremoto Psicodélico
+    // Terremoto Psicodélico
     const style = document.createElement('style');
     style.innerHTML = `
         @keyframes terremoto { 0%{transform:translate(0,0)} 10%{transform:translate(-20px,-15px)} 25%{transform:translate(20px,20px)} 50%{transform:translate(-30px,10px)} 60%{transform:translate(0,0)} }
@@ -658,7 +658,7 @@ function dispararContraAtaque() {
     `;
     document.head.appendChild(style);
 
-    // 1.4 Countdown para o Reload
+    // Countdown para o Reload
     let c = 10;
     const t = setInterval(() => {
         c--;
@@ -671,7 +671,7 @@ function dispararContraAtaque() {
     }, 1200);
 }
 
-// 2. MONITORAMENTO DE TECLAS (O Gatilho da Armadilha)
+// MONITORAMENTO DE TECLAS (O Gatilho da Armadilha)
 document.addEventListener('keydown', function(e) {
     // F12, Ctrl+U ou Ctrl+Shift+I
     if (e.keyCode == 123 || (e.ctrlKey && e.keyCode == 85) || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) {
@@ -779,7 +779,7 @@ async function iniciarConversao() {
 
 
 // 1. BLOQUEIO DE INSPEÇÃO (Ctrl+U, F12, Ctrl+Shift+I)
-/* document.addEventListener('keydown', function(e) {
+ document.addEventListener('keydown', function(e) {
     // Bloqueia F12
     if (e.keyCode == 123) {
         e.preventDefault();
@@ -800,6 +800,7 @@ async function iniciarConversao() {
 // 2. BLOQUEIO DE CLIQUE DIREITO (Evita "Inspecionar" pelo mouse)
 document.addEventListener('contextmenu', event => event.preventDefault());
 
+/*
 // 3. BLOQUEIO DE PRINT(Escurece a tela ao perder o foco)
  window.addEventListener('blur', () => {
     document.body.style.filter = "blur(15px) grayscale(100%)";
@@ -994,7 +995,7 @@ color:#fff;
 border:1px solid #334155;
 border-radius:10px;
 padding:10px;
-font-size:14px;
+font-size:20px;
 "></textarea>
 
 <div style="margin-top:10px;display:flex;gap:10px;">

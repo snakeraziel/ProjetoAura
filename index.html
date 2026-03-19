@@ -119,7 +119,10 @@
     <div class="info-row"><span class="label">Nº do Cliente:</span><span class="val" id="valNC"></span></div>
     <div class="info-row"><span class="label">Nº do Medidor:</span><span class="val" id="valMedidor"></span></div>
     <div class="info-row"><span class="label">Última Leitura:</span><span class="val" id="valULeitura"></span></div>
-    <div class="info-row"><span class="label">Consumo Anterior:</span><span class="val" id="valMediaAnt"></span></div>
+    <div class="info-row">
+    <span class="label" id="labelConsumo">Consumo Anterior:</span>
+    <span class="val" id="valMediaAnt"></span>
+</div>
     <div class="info-row"><span class="label">Nova Leitura (Sugestão: Diminua kwh):</span><span class="val" id="valNova" style="color: #22c55e;"></span></div>
     <div class="info-row"><span class="label">Entrega:</span><span class="val" id="valProcEntrega"></span></div>
     
@@ -312,6 +315,7 @@ function preencherPainel(p) {
     const nome = p[15]?.trim();               
     const medidor = p[29]?.trim() || "";      
     const media = p[33]?.trim() || "0";        
+    const diasFaturamento = p[60]?.trim() || "0";
     const nova = (parseInt(leitura) || 0) + (parseInt(media) || 0);
 
     // Campos Geração Distribuída (GD)
@@ -350,6 +354,7 @@ function preencherPainel(p) {
     document.getElementById("valMedidor").innerText = medidor;
     document.getElementById("valULeitura").innerText = leitura;
     document.getElementById("valMediaAnt").innerText = media;
+    document.getElementById("labelConsumo").innerHTML = `Consumo Anterior (<b>${diasFaturamento}</b> dias):`;
     document.getElementById("valNova").innerText = nova;
     document.getElementById("valProcEntrega").innerText = formaFinal;
     document.getElementById("valCodPrincipal").innerText = codPrincipal;

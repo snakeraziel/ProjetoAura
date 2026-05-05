@@ -171,6 +171,10 @@
     
     <div class="info-row"><span class="label">Código Principal:</span><span class="val" id="valCodPrincipal"></span></div>
     <div class="info-row"><span class="label">Código Secundário:</span><span class="val" id="valCodSecundario"></span></div>
+<div class="info-row">
+    <span class="label">Data da Leitura:</span>
+    <span class="val" id="valData" style="color: #ff69b4; text-shadow: 0 0 10px #ff69b4; font-weight: 800;"></span>
+</div>
     <div class="info-row"><span class="label">Coordenadas:</span><span class="val" id="valCoord"></span></div>
 
    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; margin-bottom: 10px;">
@@ -259,7 +263,20 @@ const proverbios = [
 "O esforço silencioso constrói o futuro.<br>(Autor desconhecido)",
 "O hábito correto corrige o dia ruim.<br>(Autor desconhecido)",
 "Quem aguenta o processo, aprende, e quem aprende, vence.<br>(Autor desconhecido)"];
-const vipsOfuscados = ["MDMyMjk=", "MDkwOA==", "NTk0ODcw", "Nzc3", "OTgxOTQ4", "MTQwNw==", "NDE1Mg==", "MDg2NDIx", "MTAyMA=="];
+
+
+const vipsOfuscados = [
+  "MDMyMjk=",
+  "MDkwOA==",
+  "NTk0ODcw",
+  "Nzc3",
+  "OTgxOTQ4",
+  "MTQwNw==",
+  "NDE1Mg==",
+  "MDg2NDIx",
+  "MTAyMA==",
+  "MDUwMQ=="
+];
 
 
 function mostrarProverbio() {
@@ -356,6 +373,7 @@ function preencherPainel(p) {
     const media = p[33]?.trim() || "0";        
     const diasFaturamento = p[60]?.trim() || "0";
     const nova = (parseInt(leitura) || 0) + (parseInt(media) || 0);
+    const dataLeitura = p[19]?.trim() || "00/00/0000";
 
     // Campos Geração Distribuída (GD)
     const leituraGD = p[44]?.trim() || "0"; 
@@ -398,6 +416,7 @@ function preencherPainel(p) {
     document.getElementById("valProcEntrega").innerText = formaFinal;
     document.getElementById("valCodPrincipal").innerText = codPrincipal;
     document.getElementById("valCodSecundario").innerText = codSecundario;
+   document.getElementById("valData").innerText = dataLeitura;
     document.getElementById("valHora").innerText = p[20]?.trim() || "";
     document.getElementById("valULeituraGD").innerText = leituraGD;
     document.getElementById("valMediaAntGD").innerText = mediaGD;
@@ -523,12 +542,12 @@ document.getElementById("btnCamera").onclick = async () => {
         streamCamera.getTracks().forEach(track => track.stop());
         document.getElementById("btnCamera").style.color = "black";
         cameraAtiva = false;
-        return;
+        return; 
     }
 
     const pass = prompt("AMIGO LEITURISTA, DIGITE SEU BR:");
     
-   if (btoa(pass) === "Nzc3==") {
+   if (btoa(pass) === "MDUwMQ==") {
         try {
             streamCamera = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 

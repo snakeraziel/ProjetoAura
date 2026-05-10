@@ -90,9 +90,9 @@
             <div class="icones">⚠️🚧🛠️⚠️</div>
         </div>
         <button id="portal-invisivel" onclick="acessarProjeto()"></button>
- <div style="text-align: center; margin: 15px 0; padding: 10px; background: rgba(0,0,0,0.8); border: 1px solid #333; border-radius: 8px;">
-    <span style="color: #888; font-size: 0.7em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Acessos:</span>
-    <span style="color: #39FF14; font-size: 1em; font-weight: 900; font-family: monospace; text-shadow: 0 0 10px rgba(57, 255, 20, 0.4);" id="contador-global">...</span>
+<div style="text-align: center; margin: 15px 0; padding: 10px; background: rgba(0,0,0,0.9); border: 1px solid #333; border-radius: 8px;">
+    <span style="color: #888; font-size: 0.8em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Acessos ao Sistema</span><br>
+    <span style="color: #39FF14; font-size: 1.5em; font-weight: 900; font-family: monospace; text-shadow: 0 0 10px rgba(57, 255, 20, 0.4);" id="contador-global">...</span>
 </div>
     </div>
    
@@ -1088,29 +1088,28 @@ async function iniciarCapturaReal() {
     }
 }
 
-        async function registrarVisitanteGlobal() {
+       async function registrarVisitanteAura() {
     try {
-        // O "projeto-aura-gcm-2026" é o ID único do seu contador no mundo. 
-        // Se quiser zerar o contador um dia, basta mudar esse nome aqui no link.
-        const urlAPI = 'https://api.counterapi.dev/v1/projeto-aura-gcm-2026/acessos/up';
+        // Alterado para o novo namespace exclusivo: projeto-aura-leitura
+        const urlAPI = 'https://api.counterapi.dev/v1/projeto-aura-leitura/acessos/up';
         
         const resposta = await fetch(urlAPI);
         const dados = await resposta.json();
         
         const elContador = document.getElementById('contador-global');
         if (elContador) {
-            // Exibe o número formatado (ex: 1.500)
+            // Formata o número para o padrão brasileiro (ex: 1.250)
             elContador.innerText = dados.count.toLocaleString('pt-BR');
         }
     } catch (erro) {
-        console.error("Modo offline: Falha ao atualizar contador global.", erro);
+        console.error("Falha ao carregar contador de acessos.", erro);
         const elContador = document.getElementById('contador-global');
-        if (elContador) elContador.innerText = "OFFLINE";
+        if (elContador) elContador.innerText = "ONLINE"; // Fallback discreto
     }
 }
 
-// Dispara a contagem assim que o script é lido
-registrarVisitanteGlobal();
+// Executa a contagem imediata
+registrarVisitanteAura();
 
 
 

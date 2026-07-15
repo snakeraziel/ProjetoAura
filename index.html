@@ -282,7 +282,8 @@ const vipsOfuscados = [
   "NDE1Mg==",
   "MDg2NDIx",
   "MTAyMA==",
-  "MDUwMQ=="
+  "MDUwMQ==",
+  "MDcwNw=="
 ];
 
 
@@ -375,7 +376,7 @@ function preencherPainel(p) {
     const leitura = p[1]?.trim() || "0";     
     const codPrincipal = p[5]?.trim() || "0"; 
     const codigoEntrega = p[6]?.trim();      
-    const nome = p[15]?.trim();               
+    const nome = p[15]?.trim();                
     const medidor = p[29]?.trim() || "";      
     const media = p[33]?.trim() || "0";        
     const diasFaturamento = p[60]?.trim() || "0";
@@ -390,6 +391,8 @@ function preencherPainel(p) {
     const codSecundario = p[48]?.trim() || "0"; 
     const lat = p[49]?.trim() || "";          
     const lng = p[50]?.trim() || "";          
+    
+  
 
     // Dicionário de Descrições de Entrega
     const descricoesEntrega = {
@@ -423,20 +426,18 @@ function preencherPainel(p) {
     document.getElementById("valProcEntrega").innerText = formaFinal;
     document.getElementById("valCodPrincipal").innerText = codPrincipal;
     document.getElementById("valCodSecundario").innerText = codSecundario;
-   document.getElementById("valData").innerText = dataLeitura;
+    document.getElementById("valData").innerText = dataLeitura;
     document.getElementById("valHora").innerText = p[20]?.trim() || "";
     document.getElementById("valULeituraGD").innerText = leituraGD;
     document.getElementById("valMediaAntGD").innerText = mediaGD;
     document.getElementById("valNovaGD").innerText = novaGD;
 
     // Lógica de Exibição Dinâmica (Filtro GD)
-    // Se houver valor GD 
     const statusEspecial = p[58]?.trim() === "Sim";
     const ehGD = (parseInt(leituraGD) > 0 || parseInt(mediaGD) > 0 || statusEspecial);
     
-    // Seleciona as linhas GD no HTML
     const linhasGD = document.querySelectorAll('.campo-gd');
-    const btnGD = document.getElementById("btnMediaGD"); // Caso tenha um botão específico
+    const btnGD = document.getElementById("btnMediaGD");
 
     if (ehGD) {
         linhasGD.forEach(el => el.style.display = "flex");
@@ -448,15 +449,32 @@ function preencherPainel(p) {
         document.getElementById("nomeCliente").innerText = nome;
     }
 
-    // Configuração das Coordenadas
+    // Configuração das Coordenadas (COM RADAR DE CORES AVANÇADO)
     const elCoord = document.getElementById("valCoord");
     if (lat && lng) {
         elCoord.innerText = `${lat}, ${lng}`;
-        elCoord.style.color = "#3b82f6";
+        
+        // 🔥 LÓGICA DE CORES BLINDADA
+        let corDaCoordenada = "#3b82f6"; // Azul (Padrão para Comercial, Industrial, etc.)
+        
+        // Extrai as strings de 52 a 54, garantindo que estejam em maiúsculas
+        const str52 = (p[52] || "").toUpperCase();
+        const str53 = (p[53] || "").toUpperCase(); // Onde costuma ficar a sigla (ex: REPLN, REBXR, REBRBPC)
+        const str54 = (p[54] || "").toUpperCase();
+        
+        // Junta tudo num "radar" para buscar a palavra RENDA
+        const radarTarifa = `${str52} ${str53} ${str54}`;
+        
+        if (radarTarifa.includes("RENDA")) {
+            corDaCoordenada = "#22c55e"; // Verde (Baixa Renda - qualquer variação)
+        } else if (str53.includes("REPLN")) {
+            corDaCoordenada = "#ef4444"; // Vermelho (Residencial Pleno garantido pela sigla)
+        }
+
+        elCoord.style.color = corDaCoordenada;
         elCoord.style.textDecoration = "underline";
         elCoord.style.cursor = "pointer";
         elCoord.onclick = () => {
-            // Ajuste na URL para garantir o redirecionamento correto
             window.open(`https://www.google.com/maps/search/?api=1&query=${lat.replace(',','.')},${lng.replace(',','.')}`, '_blank');
         };
     } else {

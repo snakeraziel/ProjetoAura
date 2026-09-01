@@ -136,7 +136,7 @@
     <div id="projeto-aura-content">
         <div class="container">
            <h2 style="text-align:center; color:var(--accent); letter-spacing: 1px; user-select: none;">
-    PROJETO <span onclick="abrirCalculadoraAura()" style="cursor: inherit;">AURA</span>
+    <span onclick="mediaManual()" style="cursor: inherit;">PROJETO</span> <span onclick="abrirCalculadoraAura()" style="cursor: inherit;">AURA</span>
 </h2>
 
  <div class="upload-area-aura" style="text-align: center;">
@@ -157,15 +157,17 @@
     <!-- inputmode="none" bloqueia o teclado do celular temporariamente -->
    <input id="busca" readonly placeholder="Nº do Cliente..." onclick="abrirTecladoAura()" oninput="verificarResetTeclado()">
   
-<!--  <button class="btn-search" onclick="fecharTecladoEBuscar()">BUSCAR 🔎</button>  -->
+  <button class="btn-search" onclick="fecharTecladoEBuscar()">BUSCAR 🔎</button>  
 
+<!--
 <button class="btn-search" onclick="mediaManual()">CONFERIR<br>MANUALMENTE</button>
+-->
 </div>
 
 <!-- TECLADO NUMÉRICO CUSTOMIZADO -->
 <div id="tecladoAura">
     <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
-        <span style="color:#b19cd9; font-weight:bold; letter-spacing:1px;">TECLADO RÁPIDO</span>
+        <span style="color:#b19cd9; font-weight:bold; letter-spacing:1px;">TECLADO AURA</span>
         <span onclick="fecharTecladoAura()" style="color:#d60606; cursor:pointer; font-weight:900; font-size:1.1em; padding: 0 10px;">Fechar</span>
     </div>
     
@@ -252,7 +254,7 @@
     <span class="val" id="valData" style="color: #ff69b4; text-shadow: 0 0 10px #ff69b4; font-weight: 800;"></span>
 </div>
     <div class="info-row"><span class="label">Coordenadas:</span><span class="val" id="valCoord"></span></div>
--------------------------------------------------------------------<br>
+---------------------------------------------------------------------<br>
    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; margin-bottom: 10px;">
     <button onclick="pular(-1)" style="padding: 15px 50px; background: transparent; color: transparent; border: none; cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent;">◀◀</button>
     

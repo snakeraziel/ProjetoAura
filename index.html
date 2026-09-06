@@ -377,14 +377,16 @@ function mostrarProverbio() {
 // ============================================================
 
 let modoLetras = false;
+let cursorPos = 0; // Controla onde o cursor está no visor
 
 function abrirTecladoAura() {
     const input = document.getElementById('busca');
     
-    // Se não estivermos no modo de letras, mantemos o foco para exibir o cursor 
-    // (o 'readonly' garante que o teclado nativo não suba)
     if (!modoLetras) {
-        input.focus(); 
+        // Removemos o readonly temporariamente para o navegador permitir o cursor, 
+        // mas chamamos o blur logo em seguida para derrubar o teclado nativo do celular
+        input.removeAttribute('readonly');
+        input.focus();
         document.getElementById('tecladoAura').style.display = 'block';
     }
 }
@@ -395,33 +397,35 @@ function fecharTecladoAura() {
 
 function digitarTeclado(num) {
     const input = document.getElementById('busca');
-    const start = input.selectionStart !== null ? input.selectionStart : input.value.length;
-    const end = input.selectionEnd !== null ? input.selectionEnd : input.value.length;
+    let valor = input.value;
     
-    // Insere o número exatamente na posição onde o cursor está piscando
-    const valorAtual = input.value;
-    input.value = valorAtual.substring(0, start) + num + valorAtual.substring(end);
+    // Pega a posição atual onde o usuário clicou/tocou no campo
+    let pos = input.selectionStart !== null ? input.selectionStart : valor.length;
     
-    // Move o cursor para a frente do número digitado
-    const novaPos = start + 1;
+    // Insere o número exatamente no ponto do cursor
+    input.value = valor.substring(0, pos) + num + valor.substring(pos);
+    
+    // Atualiza a posição do cursor para logo após o número inserido
+    let novaPos = pos + 1;
     input.setSelectionRange(novaPos, novaPos);
+    cursorPos = novaPos;
     input.focus();
 }
 
 function apagarTeclado() {
     const input = document.getElementById('busca');
-    const start = input.selectionStart;
-    const end = input.selectionEnd;
-    const valorAtual = input.value;
+    let valor = input.value;
+    let start = input.selectionStart;
+    let end = input.selectionEnd;
     
     if (start !== end) {
-        // Se houver algum trecho selecionado, apaga a seleção
-        input.value = valorAtual.substring(0, start) + valorAtual.substring(end);
+        // Se houver texto selecionado, apaga a seleção
+        input.value = valor.substring(0, start) + valor.substring(end);
         input.setSelectionRange(start, start);
     } else if (start > 0) {
-        // Se não houver seleção, apaga o caractere imediatamente antes do cursor
-        input.value = valorAtual.substring(0, start - 1) + valorAtual.substring(start);
-        const novaPos = start - 1;
+        // Apaga o caractere imediatamente antes do cursor
+        input.value = valor.substring(0, start - 1) + valor.substring(start);
+        let novaPos = start - 1;
         input.setSelectionRange(novaPos, novaPos);
     }
     input.focus();

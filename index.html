@@ -155,18 +155,26 @@
 
 <!-- CAIXA DE BUSCA MODIFICADA -->
 <div class="search-box">
-    <input id="busca" placeholder="Nº do Cliente" onclick="abrirTecladoAura()" oninput="verificarResetTeclado()">
-  
-  <button class="btn-search" onclick="fecharTecladoEBuscar()">BUSCAR 🔎</button>  
-
-<!--
-<button class="btn-search" onclick="mediaManual()">CONFERIR<br>MANUALMENTE</button>
--->
+    <!-- Transformamos em uma div que se comporta perfeitamente como visor -->
+    <div id="busca" onclick="abrirTecladoAura()" style="flex: 2; height: 48px; padding: 0 12px; border-radius: 10px; border: 1px solid #334155; background: #020617; color: #fff; font-size: 1rem; display: flex; align-items: center; cursor: pointer; user-select: none; position: relative;">
+        <span id="textoBusca" style="color: #fff;"></span>
+        <!-- Cursor piscando simulado via CSS -->
+        <span id="cursorBusca" style="display: none; width: 2px; height: 20px; background: #3b82f6; margin-left: 2px; animation: piscarCursor 1s infinite;"></span>
+        <span id="placeholderBusca" style="color: #94a3b8;">Nº do Cliente...</span>
+    </div>
+    <button class="btn-search" onclick="fecharTecladoEBuscar()">BUSCAR 🔎</button>
 </div>
+
+<style>
+@keyframes piscarCursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+</style>
 
 <!-- TECLADO NUMÉRICO CUSTOMIZADO -->
 <div id="tecladoAura">
-    <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:5px; align-items:center;">
         <span style="color:#b19cd9; font-weight:bold; letter-spacing:1px;">TECLADO AURA</span>
         <span onclick="fecharTecladoAura()" style="color:#d60606; cursor:pointer; font-weight:900; font-size:1.1em; padding: 0 10px;">Fechar</span>
     </div>
@@ -190,7 +198,7 @@
         <button onclick="mudarParaLetras()" class="btn-teclado" style="background:#3b82f6; font-size: 1.2em;">ABC</button>
     </div>
     
-    <button onclick="fecharTecladoEBuscar()" style="width:100%; padding:15px; background:#22c55e; color:black; border:none; border-radius:8px; font-weight:900; font-size:1.3em; margin-top:15px; cursor:pointer;">
+    <button onclick="fecharTecladoEBuscar()" style="width:100%; padding:10px; background:#22c55e; color:black; border:none; border-radius:8px; font-weight:900; font-size:1.2em; margin-top:10px; cursor:pointer;">
         BUSCAR 🔎
     </button>
 </div>
@@ -380,80 +388,92 @@ function mostrarProverbio() {
 // --- LÓGICA DO TECLADO NUMÉRICO CUSTOMIZADO (BLINDADO) ---
 // ============================================================
 
-let modoLetras = false;
+
 let cursorPos = 0; // Controla onde o cursor está no visor
 
 
+let modoLetras = false;
+let textoDigitado = "";
 
 function abrirTecladoAura() {
-    const input = document.getElementById('busca');
-    
-    // Se estivermos no modo numérico, abrimos o nosso teclado
     if (!modoLetras) {
-        input.blur(); // Impede o teclado nativo de subir
+        document.getElementById('cursorBusca').style.display = 'inline-block';
         document.getElementById('tecladoAura').style.display = 'block';
     }
 }
 
 function fecharTecladoAura() {
     document.getElementById('tecladoAura').style.display = 'none';
+    document.getElementById('cursorBusca').style.display = 'none';
 }
 
 function digitarTeclado(num) {
-    const input = document.getElementById('busca');
-    let valor = input.value;
-    let pos = input.selectionStart !== null ? input.selectionStart : valor.length;
-    
-    // Insere o número na posição exata do cursor
-    input.value = valor.substring(0, pos) + num + valor.substring(pos);
-    let novaPos = pos + 1;
-    input.setSelectionRange(novaPos, novaPos);
-    input.focus();
+    textoDigitado += num;
+    atualizarVisorBusca();
 }
 
 function apagarTeclado() {
-    const input = document.getElementById('busca');
-    let valor = input.value;
-    let start = input.selectionStart;
-    let end = input.selectionEnd;
+    textoDigitado = textoDigitado.slice(0, -1);
+    atualizarVisorBusca();
+}
+
+function atualizarVisorBusca() {
+    const spanTexto = document.getElementById('textoBusca');
+    const spanPlaceholder = document.getElementById('placeholderBusca');
     
-    if (start !== end) {
-        input.value = valor.substring(0, start) + valor.substring(end);
-        input.setSelectionRange(start, start);
-    } else if (start > 0) {
-        input.value = valor.substring(0, start - 1) + valor.substring(start);
-        let novaPos = start - 1;
-        input.setSelectionRange(novaPos, novaPos);
+    spanTexto.innerText = textoDigitado;
+    if (textoDigitado.length > 0) {
+        spanPlaceholder.style.display = 'none';
+    } else {
+        spanPlaceholder.style.display = 'inline';
     }
-    input.focus();
 }
 
 function mudarParaLetras() {
     modoLetras = true;
-    const input = document.getElementById('busca');
     fecharTecladoAura();
     
-    // Libera o campo para o teclado nativo do celular assumir as letras
-    setTimeout(() => {
-        input.focus();
-    }, 100);
+    // Se quiser alternar para digitação normal por letras, podemos substituir temporariamente por um input real ou deixar o usuário digitar
+    const searchBox = document.querySelector('.search-box');
+    searchBox.innerHTML = `
+        <input id="busca" placeholder="Nome do Cliente..." style="flex: 2; height: 48px; padding: 0 12px; border-radius: 10px; border: 1px solid #334155; background: #020617; color: #fff; font-size: 1rem;" autofocus oninput="sincronizarLetras(this)">
+        <button class="btn-search" onclick="fecharTecladoEBuscar()">BUSCAR 🔎</button>
+    `;
+    const inputReal = document.getElementById('busca');
+    inputReal.value = textoDigitado;
+    inputReal.focus();
+}
+
+function sincronizarLetras(el) {
+    textoDigitado = el.value;
 }
 
 function fecharTecladoEBuscar() {
     fecharTecladoAura();
-    buscarCliente();
-}
-
-function verificarResetTeclado() {
-    const input = document.getElementById('busca');
-    // Se o usuário limpou o campo no modo letras, ele volta a assumir o modo numérico padrão
-    if (input.value === '' && modoLetras) {
-        modoLetras = false;
-        input.blur();
-        abrirTecladoAura();
+    
+    // Sincroniza o valor com a variável global `busca` que a sua função original lê
+    let inputBusca = document.getElementById('busca');
+    if(inputBusca.tagName === 'INPUT') {
+        textoDigitado = inputBusca.value;
     }
+    
+    // Injeta temporariamente o valor no input global que a função `buscarCliente()` procura
+    // Criamos um campo oculto ou ajustamos a função buscarCliente para ler a variável `textoDigitado`
+    executarBuscaFinal(textoDigitado);
 }
 
+function executarBuscaFinal(termo) {
+    if (!termo || typeof base === 'undefined' || base.length === 0) return;
+
+    const index = base.findIndex(l => l.toUpperCase().includes(termo.toUpperCase()));
+    
+    if (index === -1) {
+        return alert("CLIENTE NÃO FOI LIDO NO MÊS PASSADO.");
+    }
+
+    indiceGlobal = index;
+    preencherPainel(base[indiceGlobal].split(';'));
+}
 
 function acessarProjeto() {
     // 1. Verifica se já existe um acesso salvo para não pedir senha à toa

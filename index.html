@@ -155,14 +155,14 @@
 
 <!-- CAIXA DE BUSCA MODIFICADA -->
 <div class="search-box">
-    <!-- Input normal sem readonly, permitindo que o navegador exiba o cursor azul perfeitamente -->
-    <input id="busca" inputmode="none" placeholder="Nº do Cliente..." onclick="abrirTecladoAura()" oninput="verificarResetTeclado()">
+    <!-- Começa com readonly para garantir que o teclado numérico reine e o cursor azul apareça -->
+    <input id="busca" readonly placeholder="Nº do Cliente..." onclick="abrirTecladoAura()" oninput="verificarResetTeclado()">
     <button class="btn-search" onclick="fecharTecladoEBuscar()">BUSCAR 🔎</button>
 </div>
 
 <style>
 #busca {
-    caret-color: #3b82f6 !important; /* Força o cursor azul do projeto */
+    caret-color: #3b82f6 !important; /* Força o cursor azul a ficar visível */
 }
 </style>
 
@@ -385,16 +385,16 @@ function mostrarProverbio() {
 
 let modoLetras = false;
 
-// 1. Abertura do Teclado Aura (Blindado contra conflitos)
 function abrirTecladoAura() {
     const input = document.getElementById('busca');
     
-    // Se estivermos no modo letras, o Aura não interfere em nada (deixa o teclado nativo quieto)
-    if (modoLetras) return;
-
-    // Modo Numérico Ativo
-    input.blur(); // Garante que o teclado nativo do celular fique fechado
-    document.getElementById('tecladoAura').style.display = 'block';
+    // Se não estivermos no modo de letras, forçamos o nosso teclado numérico
+    if (!modoLetras) {
+        input.setAttribute('readonly', 'true'); // Garante que está travado
+        input.blur(); // Chute no teclado nativo para garantir que ele não suba
+        input.focus(); // Mantém o foco ativo para exibir o cursor azul
+        document.getElementById('tecladoAura').style.display = 'block';
+    }
 }
 
 function fecharTecladoAura() {
@@ -402,71 +402,48 @@ function fecharTecladoAura() {
     if (teclado) teclado.style.display = 'none';
 }
 
-// 2. Mecânica de Digitação e Apagar
 function digitarTeclado(num) {
-    if (modoLetras) return;
     const input = document.getElementById('busca');
-    input.value += num; 
-    input.focus(); 
+    input.value += num;
+    input.focus(); // Mantém o cursor piscando
 }
 
 function apagarTeclado() {
-    if (modoLetras) return;
     const input = document.getElementById('busca');
-    input.value = input.value.slice(0, -1); 
-    input.focus();
-    
-    // Se apagou tudo, assegura que o estado numérico continue firme
-    if (input.value === '') {
-        modoLetras = false;
-    }
+    input.value = input.value.slice(0, -1);
+    input.focus(); // Mantém o cursor piscando
 }
 
-// 3. Alternância para o Modo de Letras (Teclado Nativo)
 function mudarParaLetras() {
     modoLetras = true;
     const input = document.getElementById('busca');
     
-    fecharTecladoAura(); // Some imediatamente com o teclado numérico do Aura
+    // Arranca a trava e esconde o nosso teclado
+    input.removeAttribute('readonly'); 
+    fecharTecladoAura();
     
+    // Dá um micro-intervalo para o celular entender a mudança e puxar o teclado dele
     setTimeout(() => {
-        input.focus(); // Puxa o teclado nativo de letras do celular limpametne
+        input.focus();
     }, 100);
 }
 
-// 4. Verificação de Reset Automático ao Apagar Tudo
+function fecharTecladoEBuscar() {
+    fecharTecladoAura();
+    buscarCliente(); // Mantém a sua função de busca original
+}
+
 function verificarResetTeclado() {
     const input = document.getElementById('busca');
     
-    // REGRA DE OURO: Se o usuário apagou tudo (mesmo no modo letras), desliga o modo letras na hora!
+    // Se você estiver no modo ABC e apagar tudo, o sistema reseta:
+    // Ele bloqueia as letras novamente, derruba o teclado nativo e devolve o teclado numérico.
     if (input.value === '') {
         modoLetras = false;
-        input.blur(); // Mata o teclado nativo
-        abrirTecladoAura(); // Traz o teclado numérico do Aura de volta perfeitamente
+        input.setAttribute('readonly', 'true'); // Trava de novo
+        input.blur(); // Derruba o teclado nativo
+        abrirTecladoAura(); // Chama o teclado numérico de volta
     }
-}
-
-// 5. Execução de Busca e Feedback 
-function fecharTecladoEBuscar() {
-    fecharTecladoAura();
-    const input = document.getElementById('busca');
-    if (input) {
-        executarBuscaFinal(input.value);
-    }
-}
-
-function executarBuscaFinal(termo) {
-    if (!termo || typeof base === 'undefined' || base.length === 0) return;
-
-    const termoBusca = termo.toUpperCase().trim();
-    const index = base.findIndex(l => l.toUpperCase().includes(termoBusca));
-    
-    if (index === -1) {
-        return alert("CLIENTE NÃO FOI LIDO NO MÊS PASSADO.");
-    }
-
-    indiceGlobal = index;
-    preencherPainel(base[indiceGlobal].split(';'));
 }
 
 

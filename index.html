@@ -161,8 +161,21 @@
 </div>
 
 <style>
+/* Esconde o cursor nativo teimoso do celular */
 #busca {
-    caret-color: #3b82f6 !important; /* Força o cursor azul a ficar visível */
+    caret-color: transparent !important;
+}
+
+/* Cria o próprio cursor azul piscando coladinho no texto */
+.search-box {
+    position: relative;
+}
+
+/* Deixa a caixa com um brilho azul elegante quando ganha o foco */
+#busca:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+    outline: none;
 }
 </style>
 

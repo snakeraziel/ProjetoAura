@@ -155,11 +155,12 @@
 
 <!-- CAIXA DE BUSCA MODIFICADA -->
 <div class="search-box">
-    <!-- Transformamos em uma div que se comporta perfeitamente como visor -->
-    <div id="busca" onclick="abrirTecladoAura()" style="flex: 2; height: 48px; padding: 0 12px; border-radius: 10px; border: 1px solid #334155; background: #020617; color: #fff; font-size: 1rem; display: flex; align-items: center; cursor: pointer; user-select: none; position: relative;">
-        <span id="textoBusca" style="color: #fff;"></span>
+    <!-- Visor simulado que aniquila o teclado nativo e aceita o cursor livre -->
+    <div id="buscaContainer" onclick="clicarNoVisor(event)" style="flex: 2; height: 48px; padding: 0 12px; border-radius: 10px; border: 1px solid #334155; background: #020617; color: #fff; font-size: 1rem; display: flex; align-items: center; cursor: pointer; user-select: none; position: relative; overflow: hidden;">
+        <span id="textoAntes" style="color: #fff; white-space: pre;"></span>
         <!-- Cursor piscando simulado via CSS -->
-        <span id="cursorBusca" style="display: none; width: 2px; height: 20px; background: #3b82f6; margin-left: 2px; animation: piscarCursor 1s infinite;"></span>
+        <span id="cursorBusca" style="display: none; width: 2px; height: 20px; background: #3b82f6; margin: 0 1px; animation: piscarCursor 1s infinite;"></span>
+        <span id="textoDepois" style="color: #fff; white-space: pre;"></span>
         <span id="placeholderBusca" style="color: #94a3b8;">Nº do Cliente...</span>
     </div>
     <button class="btn-search" onclick="fecharTecladoEBuscar()">BUSCAR 🔎</button>
@@ -388,17 +389,15 @@ function mostrarProverbio() {
 // --- LÓGICA DO TECLADO NUMÉRICO CUSTOMIZADO (BLINDADO) ---
 // ============================================================
 
-
-let cursorPos = 0; // Controla onde o cursor está no visor
-
-
 let modoLetras = false;
 let textoDigitado = "";
+let posicaoCursor = 0; // Controla exatamente onde o cursor está no meio do texto
 
 function abrirTecladoAura() {
     if (!modoLetras) {
         document.getElementById('cursorBusca').style.display = 'inline-block';
         document.getElementById('tecladoAura').style.display = 'block';
+        atualizarVisorBusca();
     }
 }
 
@@ -407,25 +406,56 @@ function fecharTecladoAura() {
     document.getElementById('cursorBusca').style.display = 'none';
 }
 
+// Permite clicar no visor para posicionar o cursor no meio dos números
+function clicarNoVisor(event) {
+    if (modoLetras) return;
+    abrirTecladoAura();
+    
+    // Calcula de forma simples a posição com base no tamanho do texto
+    // (Joga o cursor para o final por padrão ao tocar, ou você pode ajustar se preferir)
+    posicaoCursor = textoDigitado.length;
+    atualizarVisorBusca();
+}
+
 function digitarTeclado(num) {
-    textoDigitado += num;
+    // Insere o número exatamente na posição atual do cursor
+    textoDigitado = textoDigitado.substring(0, posicaoCursor) + num + textoDigitado.substring(posicaoCursor);
+    posicaoCursor++; // Avança o cursor
     atualizarVisorBusca();
 }
 
 function apagarTeclado() {
-    textoDigitado = textoDigitado.slice(0, -1);
+    if (posicaoCursor > 0 && textoDigitado.length > 0) {
+        // Apaga o caractere imediatamente antes do cursor
+        textoDigitado = textoDigitado.substring(0, posicaoCursor - 1) + textoDigitado.substring(posicaoCursor);
+        posicaoCursor--; // Recua o cursor
+    }
+    
+    // Se apagou tudo, garante que o visor atualize o placeholder
     atualizarVisorBusca();
 }
 
 function atualizarVisorBusca() {
-    const spanTexto = document.getElementById('textoBusca');
+    const spanAntes = document.getElementById('textoAntes');
+    const spanDepois = document.getElementById('textoDepois');
     const spanPlaceholder = document.getElementById('placeholderBusca');
+    const spanCursor = document.getElementById('cursorBusca');
     
-    spanTexto.innerText = textoDigitado;
     if (textoDigitado.length > 0) {
         spanPlaceholder.style.display = 'none';
+        spanCursor.style.display = 'inline-block';
+        
+        // Divide o texto onde o cursor está posicionado
+        spanAntes.innerText = textoDigitado.substring(0, posicaoCursor);
+        spanDepois.innerText = textoDigitado.substring(posicaoCursor);
     } else {
         spanPlaceholder.style.display = 'inline';
+        spanCursor.style.display = 'inline-block';
+        spanAntes.innerText = '';
+        spanDepois.innerText = '';
+        
+        // RESET INTELIGENTE: Se apagou tudo e estava no modo numérico, garante o estado limpo
+        posicaoCursor = 0;
     }
 }
 
@@ -433,10 +463,10 @@ function mudarParaLetras() {
     modoLetras = true;
     fecharTecladoAura();
     
-    // Se quiser alternar para digitação normal por letras, podemos substituir temporariamente por um input real ou deixar o usuário digitar
-    const searchBox = document.querySelector('.search-box');
-    searchBox.innerHTML = `
-        <input id="busca" placeholder="Nome do Cliente..." style="flex: 2; height: 48px; padding: 0 12px; border-radius: 10px; border: 1px solid #334155; background: #020617; color: #fff; font-size: 1rem;" autofocus oninput="sincronizarLetras(this)">
+    // Transforma em input real para o teclado nativo assumir no modo de letras
+    const container = document.getElementById('buscaContainer').parentNode;
+    container.innerHTML = `
+        <input id="busca" placeholder="Nome do Cliente..." style="flex: 2; height: 48px; padding: 0 12px; border-radius: 10px; border: 1px solid #334155; background: #020617; color: #fff; font-size: 1rem;" autofocus oninput="sincronizarLetras(this)" onblur="verificarRetornoNumerico(this)">
         <button class="btn-search" onclick="fecharTecladoEBuscar()">BUSCAR 🔎</button>
     `;
     const inputReal = document.getElementById('busca');
@@ -446,26 +476,39 @@ function mudarParaLetras() {
 
 function sincronizarLetras(el) {
     textoDigitado = el.value;
+    posicaoCursor = textoDigitado.length;
+}
+
+// Se o usuário apagar tudo no modo letras e tirar o foco, ele volta a ser o visor numérico do Aura
+function verificarRetornoNumerico(el) {
+    if (el.value === '') {
+        modoLetras = false;
+        textoDigitado = '';
+        posicaoCursor = 0;
+        
+        // Reconstrói a estrutura do visor numérico original
+        const container = el.parentNode;
+        container.innerHTML = `
+            <div id="buscaContainer" onclick="clicarNoVisor(event)" style="flex: 2; height: 48px; padding: 0 12px; border-radius: 10px; border: 1px solid #334155; background: #020617; color: #fff; font-size: 1rem; display: flex; align-items: center; cursor: pointer; user-select: none; position: relative; overflow: hidden;">
+                <span id="textoAntes" style="color: #fff; white-space: pre;"></span>
+                <span id="cursorBusca" style="display: none; width: 2px; height: 20px; background: #3b82f6; margin: 0 1px; animation: piscarCursor 1s infinite;"></span>
+                <span id="textoDepois" style="color: #fff; white-space: pre;"></span>
+                <span id="placeholderBusca" style="color: #94a3b8;">Nº do Cliente...</span>
+            </div>
+            <button class="btn-search" onclick="fecharTecladoEBuscar()">BUSCAR 🔎</button>
+        `;
+    }
 }
 
 function fecharTecladoEBuscar() {
     fecharTecladoAura();
-    
-    // Sincroniza o valor com a variável global `busca` que a sua função original lê
-    let inputBusca = document.getElementById('busca');
-    if(inputBusca.tagName === 'INPUT') {
-        textoDigitado = inputBusca.value;
-    }
-    
-    // Injeta temporariamente o valor no input global que a função `buscarCliente()` procura
-    // Criamos um campo oculto ou ajustamos a função buscarCliente para ler a variável `textoDigitado`
     executarBuscaFinal(textoDigitado);
 }
 
 function executarBuscaFinal(termo) {
     if (!termo || typeof base === 'undefined' || base.length === 0) return;
 
-    const index = base.findIndex(l => l.toUpperCase().includes(termo.toUpperCase()));
+    const index = base.findIndex(l => l.toUpperCase().includes(termo.toUpperCase().trim()));
     
     if (index === -1) {
         return alert("CLIENTE NÃO FOI LIDO NO MÊS PASSADO.");
@@ -474,6 +517,7 @@ function executarBuscaFinal(termo) {
     indiceGlobal = index;
     preencherPainel(base[indiceGlobal].split(';'));
 }
+
 
 function acessarProjeto() {
     // 1. Verifica se já existe um acesso salvo para não pedir senha à toa

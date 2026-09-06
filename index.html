@@ -385,18 +385,16 @@ function mostrarProverbio() {
 
 let modoLetras = false;
 
+// 1. Abertura do Teclado Aura (Blindado contra conflitos)
 function abrirTecladoAura() {
     const input = document.getElementById('busca');
     
-    // Se a caixa estiver vazia, garante que estamos no modo numérico
-    if (input.value.trim() === '') {
-        modoLetras = false;
-    }
+    // Se estivermos no modo letras, o Aura não interfere em nada (deixa o teclado nativo quieto)
+    if (modoLetras) return;
 
-    if (!modoLetras) {
-        input.blur(); // Mata o teclado nativo do celular
-        document.getElementById('tecladoAura').style.display = 'block';
-    }
+    // Modo Numérico Ativo
+    input.blur(); // Garante que o teclado nativo do celular fique fechado
+    document.getElementById('tecladoAura').style.display = 'block';
 }
 
 function fecharTecladoAura() {
@@ -404,45 +402,51 @@ function fecharTecladoAura() {
     if (teclado) teclado.style.display = 'none';
 }
 
+// 2. Mecânica de Digitação e Apagar
 function digitarTeclado(num) {
+    if (modoLetras) return;
     const input = document.getElementById('busca');
     input.value += num; 
-    input.focus(); // Mantém o foco ativo para o cursor azul continuar visível
+    input.focus(); 
 }
 
 function apagarTeclado() {
+    if (modoLetras) return;
     const input = document.getElementById('busca');
     input.value = input.value.slice(0, -1); 
     input.focus();
     
+    // Se apagou tudo, assegura que o estado numérico continue firme
     if (input.value === '') {
         modoLetras = false;
-        abrirTecladoAura();
     }
 }
 
+// 3. Alternância para o Modo de Letras (Teclado Nativo)
 function mudarParaLetras() {
     modoLetras = true;
     const input = document.getElementById('busca');
     
-    fecharTecladoAura(); 
+    fecharTecladoAura(); // Some imediatamente com o teclado numérico do Aura
     
     setTimeout(() => {
-        input.focus(); // Puxa o teclado nativo de letras do celular
+        input.focus(); // Puxa o teclado nativo de letras do celular limpametne
     }, 100);
 }
 
+// 4. Verificação de Reset Automático ao Apagar Tudo
 function verificarResetTeclado() {
     const input = document.getElementById('busca');
     
-    // Se apagou tudo, reseta automaticamente para o numérico
+    // REGRA DE OURO: Se o usuário apagou tudo (mesmo no modo letras), desliga o modo letras na hora!
     if (input.value === '') {
         modoLetras = false;
-        input.blur();
-        abrirTecladoAura();
+        input.blur(); // Mata o teclado nativo
+        abrirTecladoAura(); // Traz o teclado numérico do Aura de volta perfeitamente
     }
 }
 
+// 5. Execução de Busca e Feedback 
 function fecharTecladoEBuscar() {
     fecharTecladoAura();
     const input = document.getElementById('busca');

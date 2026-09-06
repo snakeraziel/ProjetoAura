@@ -6,6 +6,11 @@
     <title>SITE EM CONSTRUÇÃO</title>
     <style>
 
+/* Força o cursor a aparecer no Teclado Aura mesmo com o input travado */
+#busca {
+    caret-color: #3b82f6 !important; /* Cor do cursor piscando (azul Aura) */
+}
+
 /* ESTILOS DO TECLADO NUMÉRICO AURA */
 #tecladoAura {
     display: none; 
@@ -150,8 +155,7 @@
 
 <!-- CAIXA DE BUSCA MODIFICADA -->
 <div class="search-box">
-    <!-- inputmode="none" bloqueia o teclado do celular temporariamente -->
-   <input id="busca" readonly placeholder="Nº do Cliente..." onclick="abrirTecladoAura()" oninput="verificarResetTeclado()">
+    <input id="busca" placeholder="Nº do Cliente" onclick="abrirTecladoAura()" oninput="verificarResetTeclado()">
   
   <button class="btn-search" onclick="fecharTecladoEBuscar()">BUSCAR 🔎</button>  
 
@@ -379,14 +383,14 @@ function mostrarProverbio() {
 let modoLetras = false;
 let cursorPos = 0; // Controla onde o cursor está no visor
 
+
+
 function abrirTecladoAura() {
     const input = document.getElementById('busca');
     
+    // Se estivermos no modo numérico, abrimos o nosso teclado
     if (!modoLetras) {
-        // Removemos o readonly temporariamente para o navegador permitir o cursor, 
-        // mas chamamos o blur logo em seguida para derrubar o teclado nativo do celular
-        input.removeAttribute('readonly');
-        input.focus();
+        input.blur(); // Impede o teclado nativo de subir
         document.getElementById('tecladoAura').style.display = 'block';
     }
 }
@@ -398,17 +402,12 @@ function fecharTecladoAura() {
 function digitarTeclado(num) {
     const input = document.getElementById('busca');
     let valor = input.value;
-    
-    // Pega a posição atual onde o usuário clicou/tocou no campo
     let pos = input.selectionStart !== null ? input.selectionStart : valor.length;
     
-    // Insere o número exatamente no ponto do cursor
+    // Insere o número na posição exata do cursor
     input.value = valor.substring(0, pos) + num + valor.substring(pos);
-    
-    // Atualiza a posição do cursor para logo após o número inserido
     let novaPos = pos + 1;
     input.setSelectionRange(novaPos, novaPos);
-    cursorPos = novaPos;
     input.focus();
 }
 
@@ -419,11 +418,9 @@ function apagarTeclado() {
     let end = input.selectionEnd;
     
     if (start !== end) {
-        // Se houver texto selecionado, apaga a seleção
         input.value = valor.substring(0, start) + valor.substring(end);
         input.setSelectionRange(start, start);
     } else if (start > 0) {
-        // Apaga o caractere imediatamente antes do cursor
         input.value = valor.substring(0, start - 1) + valor.substring(start);
         let novaPos = start - 1;
         input.setSelectionRange(novaPos, novaPos);
@@ -434,12 +431,9 @@ function apagarTeclado() {
 function mudarParaLetras() {
     modoLetras = true;
     const input = document.getElementById('busca');
-    
-    // Arranca a trava e esconde o nosso teclado
-    input.removeAttribute('readonly'); 
     fecharTecladoAura();
     
-    // Dá um micro-intervalo para o celular entender a mudança e puxar o teclado dele
+    // Libera o campo para o teclado nativo do celular assumir as letras
     setTimeout(() => {
         input.focus();
     }, 100);
@@ -452,14 +446,11 @@ function fecharTecladoEBuscar() {
 
 function verificarResetTeclado() {
     const input = document.getElementById('busca');
-    
-    // Se você estiver no modo ABC e apagar tudo, o sistema é inteligente:
-    // Ele bloqueia as letras novamente e devolve o teclado numérico.
-    if (input.value === '') {
+    // Se o usuário limpou o campo no modo letras, ele volta a assumir o modo numérico padrão
+    if (input.value === '' && modoLetras) {
         modoLetras = false;
-        input.setAttribute('readonly', 'true'); // Trava de novo
-        input.blur(); // Derruba o teclado nativo
-        abrirTecladoAura(); // Chama a Mãe dos Burros de volta
+        input.blur();
+        abrirTecladoAura();
     }
 }
 

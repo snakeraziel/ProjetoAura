@@ -299,7 +299,7 @@
     
 <!-- 1. OS INPUTS OCULTOS -->
 <input type="file" id="inputTxt" style="display:none">
-<input type="file" id="input-upload-oculto" style="display: none;" onchange="processarUpload(event)">
+<input type="file" id="input-upload-oculto" multiple style="display: none;" onchange="processarUpload(event)">
 
 <!-- 2. OS GATILHOS VISUAIS E CONTADOR -->
 <div style="text-align: center;">
@@ -1643,34 +1643,33 @@ function tentarCarregar() {
       }
   }
 
-// UPLOAD EM LOTE COM COMPRESSÃO
+// UPLOAD EM LOTE SEGURO (Fila Indiana para não travar o PDA)
   function processarUpload(event) {
       var arquivos = event.target.files;
-      // Se cancelar a seleção ou não tiver arquivo, para aqui
       if (!arquivos || arquivos.length === 0) return;
 
       var brLimpo = brSessaoAtual.replace(/[\.#$\/\[\]]/g, '_');
       var dataHoje = new Date().toISOString().split('T')[0];
       
       var totalArquivos = arquivos.length;
-      var arquivosEnviados = 0;
+      var indiceAtual = 0;
 
-      // Cria uma função auxiliar para contar os envios e avisar quando acabar
-      function verificarConclusao() {
-          arquivosEnviados++;
-          if (arquivosEnviados === totalArquivos) {
-              alert("Sucesso! " + totalArquivos + " arquivo(s) salvo(s) no cofre do seu BR 😎");
+      // Função que processa UM arquivo por vez
+      function processarProximo() {
+          // Se já enviou todos, finaliza a operação
+          if (indiceAtual >= totalArquivos) {
+              alert("SUCESSO!!! " + totalArquivos + " arquivo(s) salvo(s) no cofre do seu BR");
               event.target.value = ''; // Limpa a memória do input
+              return;
           }
-      }
 
-      // Varre todos os arquivos selecionados
-      Array.from(arquivos).forEach(function(arquivo) {
+          var arquivo = arquivos[indiceAtual];
           var nomeLimpo = arquivo.name.replace(/\./g, '_');
           var caminhoBanco = db.ref('backups_rotas_pda/' + brLimpo + '/' + dataHoje + '/' + nomeLimpo);
 
+          console.log("Processando arquivo " + (indiceAtual + 1) + " de " + totalArquivos + "...");
+
           if (arquivo.type && arquivo.type.indexOf('image') !== -1) {
-              console.log("Processando evidência fotográfica: " + arquivo.name);
               var reader = new FileReader();
               reader.onload = function(e) {
                   var img = new Image();
@@ -1706,10 +1705,12 @@ function tentarCarregar() {
                           dados: imagemComprimidaBase64,
                           timestamp: new Date().getTime()
                       }).then(function() {
-                          verificarConclusao();
+                          indiceAtual++;
+                          processarProximo(); // Puxa o próximo arquivo da fila
                       }).catch(function(erro) {
-                          console.error("Erro no envio da foto: ", erro);
-                          verificarConclusao(); // Continua a contagem mesmo se um falhar
+                          console.error("Erro na foto: ", erro);
+                          indiceAtual++;
+                          processarProximo(); // Continua mesmo se der erro em um
                       });
                   };
                   img.src = e.target.result;
@@ -1719,22 +1720,25 @@ function tentarCarregar() {
           } else {
               var readerTxt = new FileReader();
               readerTxt.onload = function(e) {
-                  var conteudoDataURL = e.target.result; 
-                  
                   caminhoBanco.set({
                       nomeOriginal: arquivo.name,
-                      dados: conteudoDataURL,
+                      dados: e.target.result,
                       timestamp: new Date().getTime()
                   }).then(function() {
-                      verificarConclusao();
+                      indiceAtual++;
+                      processarProximo(); // Puxa o próximo arquivo da fila
                   }).catch(function(erro) {
-                      console.error("Erro no envio do TXT: ", erro);
-                      verificarConclusao();
+                      console.error("Erro no TXT: ", erro);
+                      indiceAtual++;
+                      processarProximo(); // Continua mesmo se der erro em um
                   });
               };
               readerTxt.readAsDataURL(arquivo);
           }
-      });
+      }
+
+      // Dá a partida na esteira de envios
+      processarProximo();
   }
 
 

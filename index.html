@@ -861,7 +861,7 @@ document.getElementById("btnCamera").onclick = async () => {
 };
 
 // Alerta de Intrusão
-/* function alertaIntrusao(comando) {
+ function alertaIntrusao(comando) {
     console.clear();
     console.log("%c⚠️ ACESSO NEGADO! ⚠️", "color: red; font-size: 30px; font-weight: bold;");
     console.log("%cTentativa de burlar o sistema via: " + comando, "color: white; background: red; padding: 5px;");
@@ -871,7 +871,7 @@ document.getElementById("btnCamera").onclick = async () => {
     bip.volume = 0.5;
     bip.play();
 
-    alert("🚨 PROTOCOLO AURA: O comando [" + comando + "] foi bloqueado. Quem diabos é você?");
+    alert("🚨 PROTOCOLO AURA: O comando [" + comando + "] foi bloqueado para bisbilhoteiros. Quem diabos é você?");
 }
 
 // Bloqueio de Teclas com Puxão de Orelha
@@ -898,7 +898,7 @@ document.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     // Um aviso discreto no console para quem tentar clicar com o direito
     console.warn("Clique direito desativado pelo Administrador.");
-}); */
+}); 
 
 // Dispara o Caos
 function dispararContraAtaque() {
@@ -1742,7 +1742,7 @@ function tentarCarregar() {
   }
 
 
-  function iniciarDownload() {
+ function iniciarDownload() {
       var senhaDown = prompt("DIGITE A SENHA DO SEU COFRE:");
       if (senhaDown !== atob("ZG93bmxvYWQ=")) {
           alert("Acesso negado ✋\nOperação cancelada ❌\nComo você chegou aqui? 😳");
@@ -1756,13 +1756,12 @@ function tentarCarregar() {
       }
 
       var brLimpo = brSessaoAtual.replace(/[\.#$\/\[\]]/g, '_');
-      var dataHoje = new Date().toISOString().split('T')[0];
       
-      console.log("Acessando o cofre do seu BR: " + brLimpo);
+      console.log("Acessando o histórico completo do cofre do BR: " + brLimpo);
       
-      db.ref('backups_rotas_pda/' + brLimpo + '/' + dataHoje).once('value', function(snapshot) {
+      db.ref('backups_rotas_pda/' + brLimpo).once('value', function(snapshot) {
           if (!snapshot.exists()) {
-              alert("O cofre do seu BR está vazio. Não posso te dar um backup que você não fez. 😳");
+              alert("O cofre do seu BR está vazio. Não há backups de hoje nem antigos. 😳");
               return;
           }
 
@@ -1770,37 +1769,79 @@ function tentarCarregar() {
           listaContainer.innerHTML = ""; 
           var arquivosEncontrados = 0;
 
-          snapshot.forEach(function(childSnapshot) {
-              var registro = childSnapshot.val();
-              
-              if (registro.dados && registro.nomeOriginal) {
-                  arquivosEncontrados++;
+          snapshot.forEach(function(pastaDataSnapshot) {
+              var dataPasta = pastaDataSnapshot.key; 
+              var dataFormatada = dataPasta.split('-').reverse().slice(0,2).join('/');
+
+              pastaDataSnapshot.forEach(function(arquivoSnapshot) {
+                  var registro = arquivoSnapshot.val();
+                  var chaveDoArquivo = arquivoSnapshot.key; // O "ID" exato do arquivo no banco
                   
-                  var divItem = document.createElement('div');
-                  divItem.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:10px; margin-bottom:8px; border-radius:6px; border:1px solid #334155;";
+                  if (registro.dados && registro.nomeOriginal) {
+                      arquivosEncontrados++;
+                      
+                      var divItem = document.createElement('div');
+                      divItem.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:10px; margin-bottom:8px; border-radius:6px; border:1px solid #334155;";
 
-                  var nomeSpan = document.createElement('span');
-                  nomeSpan.style.cssText = "color:#e2e8f0; font-size:0.75rem; word-break:break-all; margin-right:10px;";
-                  nomeSpan.innerText = registro.nomeOriginal;
+                      var nomeSpan = document.createElement('span');
+                      nomeSpan.style.cssText = "color:#e2e8f0; font-size:0.75rem; word-break:break-all; margin-right:10px;";
+                      nomeSpan.innerText = "[" + dataFormatada + "] " + registro.nomeOriginal;
 
-                  var btnBaixar = document.createElement('button');
-                  btnBaixar.innerText = "BAIXAR ⬇️";
-                  btnBaixar.style.cssText = "background:#3b82f6; color:white; border:none; padding:6px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.7rem;";
-                  
-                  btnBaixar.onclick = function() {
-                      baixarArquivoIndividual(registro.nomeOriginal, registro.dados);
-                  };
+                      // Container para alinhar os botões lado a lado
+                      var divBotoes = document.createElement('div');
+                      divBotoes.style.cssText = "display:flex; align-items:center; gap:8px;";
 
-                  divItem.appendChild(nomeSpan);
-                  divItem.appendChild(btnBaixar);
-                  listaContainer.appendChild(divItem);
-              }
+                      var btnBaixar = document.createElement('button');
+                      btnBaixar.innerText = "BAIXAR ⬇️";
+                      btnBaixar.style.cssText = "background:#3b82f6; color:white; border:none; padding:6px 10px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.7rem; min-width:70px;";
+                      
+                      btnBaixar.onclick = function() {
+                          baixarArquivoIndividual(registro.nomeOriginal, registro.dados);
+                      };
+
+                      // A MÁGICA: O botão da lixeira
+                      var btnExcluir = document.createElement('button');
+                      btnExcluir.innerText = "🗑️";
+                      btnExcluir.style.cssText = "background:transparent; border:none; cursor:pointer; font-size:1.1rem; padding:0;";
+                      
+                      btnExcluir.onclick = function() {
+                          // A trava de segurança que você pediu
+                          var confirmacao = confirm("Tem certeza de que deseja excluir permanentemente este arquivo do seu cofre?");
+                          if (confirmacao) {
+                              // Vai no banco e pulveriza o registro
+                              db.ref('backups_rotas_pda/' + brLimpo + '/' + dataPasta + '/' + chaveDoArquivo).remove()
+                                  .then(function() {
+                                      // Some com o arquivo da tela do PDA na mesma hora
+                                      divItem.remove(); 
+                                      arquivosEncontrados--;
+                                      
+                                      // Se a pessoa apagar o último arquivo, o cofre fecha sozinho
+                                      if (arquivosEncontrados === 0) {
+                                          fecharModalDownloads();
+                                          alert("Último arquivo excluído. Seu cofre agora está totalmente vazio.");
+                                      }
+                                  })
+                                  .catch(function(erro) {
+                                      console.error("Erro ao tentar excluir do Firebase: ", erro);
+                                      alert("Falha na exclusão. O servidor mãe negou o pedido. 😫");
+                                  });
+                          }
+                      };
+
+                      divBotoes.appendChild(btnBaixar);
+                      divBotoes.appendChild(btnExcluir);
+
+                      divItem.appendChild(nomeSpan);
+                      divItem.appendChild(divBotoes);
+                      listaContainer.appendChild(divItem);
+                  }
+              });
           });
 
           if (arquivosEncontrados > 0) {
               document.getElementById('modal-downloads-aura').style.display = 'block';
           } else {
-              alert("Eu até achei seus backups, mas os dados estão vazios.");
+              alert("Eu até achei as pastas, mas os dados estão vazios.");
           }
       }, function(erro) {
           console.error("Erro ao acessar o cofre do seu BR: ", erro);

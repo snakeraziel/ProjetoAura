@@ -1012,26 +1012,31 @@ document.getElementById('inputTxt').addEventListener('change', function(event) {
     const vipsDecodificados = vipsOfuscados.map(v => atob(v));
     const el = document.getElementById('emojiCarga');
 
-    if (vipsDecodificados.includes(idLimpo)) {
-        
-        el.innerText = "😎";
-        alert("AURA ATIVADA A TODO VAPOR");
-        
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-            const linhas = ev.target.result.split(/\r?\n/);
-            base = linhas.filter(l => l.includes(';'));
-            
-            // --- SALVA O ARQUIVO DEFINITIVAMENTE ---
-            localStorage.setItem('auraBaseDados', JSON.stringify(base)); 
-            localStorage.setItem('auraAuth', 'true'); // Garante que o login está salvo
-            
-            if (typeof mostrarRegistro === "function") mostrarRegistro(0);
-        };
-        reader.readAsText(arquivo, "UTF-8");
+   if (vipsDecodificados.includes(idLimpo)) {
+          el.innerText = "😎";
+          
+          sessaoAuraAtiva = true;
+          brSessaoAtual = idLimpo;
+          
+          localStorage.setItem('auraAuth', 'true');
+          localStorage.setItem('auraBRAtivo', idLimpo);
 
-    } else {
-        // --- MANUTENÇÃO (Se errar a senha, bloqueia) ---
+          var reader = new FileReader();
+          reader.onload = function(ev) {
+              var linhas = ev.target.result.split(/\r?\n/);
+              base = linhas.filter(function(l) { return l.includes(';'); });
+              localStorage.setItem('auraBaseDados', JSON.stringify(base));  
+              
+              // O alerta entra aqui, já disparando a quantidade de clientes lidos
+              alert("AURA ATIVADA PARA " + base.length + " CLIENTES 😎");
+
+              if (typeof mostrarRegistro === "function") mostrarRegistro(0);
+          };
+          reader.readAsText(arquivo, "UTF-8");
+          
+      } else {
+          // A GUILHOTINA: Errou a senha, destrói a sessão e expulsa pra capa
+        
         event.target.value = ""; 
         el.innerText = "😳";
 
@@ -1567,7 +1572,6 @@ function tentarCarregar() {
 
       if (vipsDecodificados.includes(idLimpo)) {
           el.innerText = "😎";
-          alert("AURA ATIVADA A TODO VAPOR");
           
           sessaoAuraAtiva = true;
           brSessaoAtual = idLimpo;
@@ -1578,17 +1582,19 @@ function tentarCarregar() {
           var reader = new FileReader();
           reader.onload = function(ev) {
               var linhas = ev.target.result.split(/\r?\n/);
-              
-              // VOLTAMOS PARA A SUA VARIÁVEL 'base' (Sem o window.)
               base = linhas.filter(function(l) { return l.includes(';'); });
-              
               localStorage.setItem('auraBaseDados', JSON.stringify(base));  
+              
+              // O alerta entra aqui, já disparando a quantidade de clientes lidos
+            mostrarAlertaAura(base.length);
+
               if (typeof mostrarRegistro === "function") mostrarRegistro(0);
           };
           reader.readAsText(arquivo, "UTF-8");
           
       } else {
-          // A GUILHOTINA
+          // A GUILHOTINA: Errou a senha, destrói a sessão e expulsa pra capa
+
           sessaoAuraAtiva = false;
           brSessaoAtual = "";
           localStorage.removeItem('auraAuth');
@@ -1629,6 +1635,20 @@ function tentarCarregar() {
     }
 });
 
+
+function mostrarAlertaAura(quantidade) {
+      var toast = document.createElement('div');
+      toast.style.cssText = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#0f172a; border:2px solid #39FF14; color:white; padding:15px 25px; border-radius:8px; z-index:9999; text-align:center; box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); font-family:monospace; font-size:1rem;";
+      
+      toast.innerHTML = "AURA ATIVADA A TODO VAPOR 😎<br>LISTA CARREGADA COM <b style='color:#39FF14; font-size:1.4rem;'>" + quantidade + "</b> CLIENTES";
+      
+      document.body.appendChild(toast);
+      
+      // Some sozinho após 4 segundos
+      setTimeout(function() { 
+          toast.remove(); 
+      }, 4000);
+  }
 
 
   function acionarUpload() {
